@@ -11,4 +11,6 @@ module com.chaldea.visualparsing {
     exports com.chaldea.visualparsing.gui;
     exports com.chaldea.visualparsing.exception;
     exports com.chaldea.visualparsing.exception.grammar;
+    exports com.chaldea.visualparsing.controller;
+    opens com.chaldea.visualparsing.controller to javafx.fxml;
 }

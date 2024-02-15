@@ -12,15 +12,15 @@
       minHeight="300.0" minWidth="400.0" prefHeight="485.0" prefWidth="613.0" spacing="5.0"
       stylesheets="@./css/default1.css" xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.chaldea.visualparsing.MainFrameController">
+      fx:controller="com.chaldea.visualparsing.controller.MainFrameController">
    <children>
       <MenuBar styleClass="custom-menu-bar">
          <menus>
             <Menu mnemonicParsing="false" text="文法">
                <items>
-<!--                  <MenuItem mnemonicParsing="false" onAction="#createGrammar" text="新建" />-->
-<!--                  <MenuItem mnemonicParsing="false" onAction="#openGrammar" text="打开" />-->
-<!--                  <MenuItem mnemonicParsing="false" onAction="#saveGrammar" text="保存" />-->
+                  <MenuItem mnemonicParsing="false" onAction="#createGrammar" text="新建" />
+                  <MenuItem mnemonicParsing="false" onAction="#openGrammar" text="打开" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveGrammar" text="保存" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="要">
@@ -38,7 +38,7 @@
       <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="447.0" prefWidth="613.0" tabClosingPolicy="UNAVAILABLE">
          <tabs>
              <Tab text="文法">
-                 <fx:include source="grammar-view.fxml"/>
+                 <fx:include source="grammar-view.fxml" />
              </Tab>
             <Tab text="Untitled Tab 2" />
          </tabs>

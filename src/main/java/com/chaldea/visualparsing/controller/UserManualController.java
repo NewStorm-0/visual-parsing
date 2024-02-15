@@ -1,5 +1,7 @@
-package com.chaldea.visualparsing;
+package com.chaldea.visualparsing.controller;
 
+import com.chaldea.visualparsing.ControllerMediator;
+import com.chaldea.visualparsing.Main;
 import com.chaldea.visualparsing.gui.ExceptionDialogUtils;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
@@ -7,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 public class UserManualController {
     @FXML
@@ -14,14 +18,21 @@ public class UserManualController {
     private static final Logger logger =
             LoggerFactory.getLogger(UserManualController.class);
 
+    public UserManualController() {
+        ControllerMediator.getInstance().setUserManualController(this);
+        logger.debug("已经注册UserManualController");
+    }
+
     @FXML
     public void initialize() {
         readFromManual();
     }
 
     private void readFromManual() {
-        try (InputStream input = getClass().getResourceAsStream("manual.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+        try (InputStream input = getClass()
+                .getResourceAsStream("/com/chaldea/visualparsing/manual.txt");
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(input, StandardCharsets.UTF_8))) {
             StringBuilder sb = new StringBuilder(128);
             String line;
             while ((line = reader.readLine()) != null) {

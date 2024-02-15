@@ -1,15 +1,15 @@
-package com.chaldea.visualparsing;
+package com.chaldea.visualparsing.controller;
 
+import com.chaldea.visualparsing.ControllerMediator;
+import com.chaldea.visualparsing.Main;
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.gui.ExceptionDialogUtils;
 import com.chaldea.visualparsing.gui.ExpressionHBox;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Screen;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,17 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.stage.Stage;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GrammarViewController {
-
-    public static String TITLE_SUFFIX = "——可视化分析器";
     @FXML
     protected VBox topVBox;
-    @FXML
-    protected TabPane tabPane;
     @FXML
     protected VBox scrollVBox;
     @FXML
@@ -48,19 +43,14 @@ public class GrammarViewController {
 
     public GrammarViewController() {
         expressionHBoxList = new ArrayList<>(32);
+        ControllerMediator.getInstance().setGrammarViewController(this);
+        logger.debug("已经注册GrammarViewController");
     }
 
     @FXML
     public void initialize() {
-        Screen screen = Screen.getPrimary();
-        double topVBoxWidth = screen.getVisualBounds().getWidth() - 60;
-        double topVBoxHeight = screen.getVisualBounds().getHeight() - 120;
-        topVBox.setPrefSize(topVBoxWidth, topVBoxHeight);
-        topVBox.setMinSize(400, 300);
-        tabPane.prefHeightProperty().bind(topVBox.heightProperty().subtract(35));
-//        tabPane.setPrefSize(topVBoxWidth, topVBoxHeight - 35);
-//        grammarScrollPane.setPrefSize(topVBoxWidth, topVBoxHeight - 125);
-        grammarScrollPane.prefHeightProperty().bind(topVBox.heightProperty().subtract(125));
+        VBox vbox = ControllerMediator.getInstance().getMainFrameController().topVBox;
+        grammarScrollPane.prefHeightProperty().bind(vbox.heightProperty().subtract(125));
     }
 
     /**
@@ -89,32 +79,24 @@ public class GrammarViewController {
         grammar = null;
         grammarFile = null;
         scrollVBox.getChildren().clear();
-    }
-
-    /**
-     * 修改窗口标题前缀
-     * @param titlePrefix 标题前缀
-     */
-    private void setStageTitlePrefix(String titlePrefix) {
-        ((Stage) topVBox.getScene().getWindow()).setTitle(titlePrefix + TITLE_SUFFIX);
+        expressionHBoxList = new ArrayList<>(32);
     }
 
     /**
      * 新建一个文法
      */
-    @FXML
-    protected void createGrammar() {
+    public void createGrammar() {
         cleanupPreviousData();
         grammar = new Grammar();
-        setStageTitlePrefix("未命名文法");
+        ControllerMediator.getInstance().setStageTitlePrefix("未命名文法");
+        scrollVBox.getChildren().addAll(expressionHBoxList);
         addExpressionButton.setDisable(false);
     }
 
     /**
      * 选择一个文件，并从该文件中读出一个文法
      */
-    @FXML
-    protected void openGrammar() {
+    public void openGrammar() {
         cleanupPreviousData();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("打开文法文件");
@@ -133,7 +115,7 @@ public class GrammarViewController {
         try {
             grammar = GrammarReaderWriter.readGrammarFromFile(grammarFile);
             logger.debug(grammar.toString());
-            setStageTitlePrefix(grammarFile.getName());
+            ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
             // 将文法中所有产生式进行添加
             for (Production production : grammar.getProductions()) {
                 Nonterminal head = production.getHead();
@@ -168,8 +150,7 @@ public class GrammarViewController {
      * 保存当前文法到文件中
      * <p>用户新建文件后，第一次保存要弹出对话框选择文件位置，后续就成为第三种情况</p>
      */
-    @FXML
-    protected void saveGrammar() {
+    public void saveGrammar() {
         if (grammarFile == null && !unsaved && grammar == null) {
             // 没有打开、新建、修改文法文件，则无需进行任何操作
             return;
@@ -187,7 +168,7 @@ public class GrammarViewController {
             if (grammarFile == null) {
                 return;
             }
-            setStageTitlePrefix(grammarFile.getName());
+            ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
             // 若选择了文件，则一定符合下列判定
         }
         if (grammarFile != null && unsaved) {
@@ -222,24 +203,4 @@ public class GrammarViewController {
         // TODO:
         expressionHBoxList.add(new ExpressionHBox());
     }
-
-    /**
-     * 打开用户手册对话框
-     */
-    @FXML
-    protected void openUserManual() {
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("使用说明");
-        ButtonType buttonType = new ButtonType("好的", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(buttonType);
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("user-manual.fxml"));
-        try {
-            dialog.getDialogPane().setContent(loader.load());
-            dialog.showAndWait();
-        } catch (IOException e) {
-            logger.error("", e);
-            ExceptionDialogUtils.showExceptionDialog(e);
-        }
-    }
-
 }
