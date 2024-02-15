@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: gold" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.UserManualController">
+   <children>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@picture/Abbey-Road.jpg" />
+         </image>
+      </ImageView>
+      <Text fx:id="text" layoutX="183.0" layoutY="32.0" strokeType="OUTSIDE"
+            strokeWidth="0.0"
+             text=" protected void openUserManual() {        Dialog&lt;Void&gt; dialog = new Dialog&lt;&gt;();        dialog.setTitle(&quot;使用说明&quot;);        FXMLLoader loader = new FXMLLoader(Main.class.getResource(&quot;user-manual.fxml&quot;));        try {            dialog.getDialogPane().setContent(loader.load());            dialog.showAndWait();        } catch (IOException e) {            logger.error(e.toString());            showExceptionDialog(e);        }    }" wrappingWidth="416.2802734375">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>

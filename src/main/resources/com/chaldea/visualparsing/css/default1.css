@@ -1,0 +1,11 @@
+.custom-menu-bar {
+    -fx-padding: 0;
+}
+
+.tab-pane {
+    -fx-background-color: #b4fbd0;
+}
+
+.scroll-pane {
+    -fx-background-color: #b4fbd0;
+}
