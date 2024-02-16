@@ -20,9 +20,13 @@ import java.io.StreamCorruptedException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The type Grammar view controller.
+ */
 public class GrammarViewController {
     @FXML
     protected VBox topVBox;
@@ -169,7 +173,7 @@ public class GrammarViewController {
         cleanupPreviousData();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("打开文法文件");
-        fileChooser.setInitialDirectory(new File("./"));
+        fileChooser.setInitialDirectory(new File("./target/test-classes/com/chaldea/visualparsing"));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("所有文件", "*.*"),
                 new FileChooser.ExtensionFilter("文法文件", "*.gra")
@@ -264,6 +268,16 @@ public class GrammarViewController {
                 logger.error("写入文法文件错误", e);
             }
         }
+    }
+
+
+    /**
+     * Gets nonterminal copy.
+     *
+     * @return the nonterminal copy
+     */
+    public Set<Nonterminal> getNonterminalCopy() {
+        return new HashSet<>(grammar.getNonterminals());
     }
 
     /**
@@ -375,6 +389,10 @@ public class GrammarViewController {
             }
             if (change.wasRemoved()) {
                 handleRemovedNonterminals(change);
+            }
+            // ExpressionHBox 自动补全更新
+            for (ExpressionHBox expressionHBox : expressionHBoxList) {
+                expressionHBox.updateLeftAutoCompletionBinding();
             }
         }
     }

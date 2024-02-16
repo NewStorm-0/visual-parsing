@@ -33,7 +33,7 @@ public abstract class ProductionSymbol implements Serializable {
 
     @Override
     public String toString() {
-        return '\'' + value + '\'';
+        return value;
     }
 
     @Override

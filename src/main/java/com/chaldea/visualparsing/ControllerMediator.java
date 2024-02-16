@@ -3,7 +3,11 @@ package com.chaldea.visualparsing;
 import com.chaldea.visualparsing.controller.GrammarViewController;
 import com.chaldea.visualparsing.controller.MainFrameController;
 import com.chaldea.visualparsing.controller.UserManualController;
+import com.chaldea.visualparsing.grammar.Grammar;
+import com.chaldea.visualparsing.grammar.Nonterminal;
 import javafx.scene.Scene;
+
+import java.util.Set;
 
 /**
  * controller 中介类
@@ -52,6 +56,20 @@ public class ControllerMediator {
      */
     public void setStageTitlePrefix(String titlePrefix) {
         mainFrameController.setStageTitlePrefix(titlePrefix);
+    }
+
+    /**
+     * Gets grammar.
+     *
+     * @return the grammar
+     */
+    @Deprecated
+    public Grammar getGrammar() {
+        return null;
+    }
+
+    public Set<Nonterminal> getNonterminalCopy() {
+        return grammarViewController.getNonterminalCopy();
     }
 
     /**

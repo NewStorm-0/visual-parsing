@@ -1,8 +1,12 @@
 package com.chaldea.visualparsing.gui;
 
+import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.grammar.Expression;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.ProductionSymbol;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -11,8 +15,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +26,8 @@ import java.util.regex.Pattern;
 /**
  * 自定义HBox，用来表示一个表达式及头部
  */
-public final class ExpressionHBox extends HBox {
+public class ExpressionHBox extends HBox {
+    public AutoCompletionBinding<Nonterminal> leftAutoCompletionBinding;
     private final TextField left = new TextField();
     private final TextField right = new TextField();
     private final Button editButton = new Button("编辑");
@@ -31,10 +38,16 @@ public final class ExpressionHBox extends HBox {
         this.setAlignment(Pos.CENTER_LEFT);
         this.setFillHeight(false);
         this.setSpacing(15.0);
+//        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
+//                getNonterminalSuggestionProvider(), getNonterminalStringConverter());
+        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
+                ControllerMediator.getInstance().getNonterminalCopy());
         left.setEditable(false);
         left.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
+        left.setPromptText("输入产生式头(非终结符)");
         right.setEditable(false);
         right.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
+        right.setPromptText("输入产生式体");
         Label rightArrow = new Label("➡");
         rightArrow.setScaleX(2.0);
         rightArrow.setScaleY(1.2);
@@ -55,14 +68,25 @@ public final class ExpressionHBox extends HBox {
         left.setText(head.getValue());
     }
 
+    /**
+     * Update left auto completion binding.
+     */
+    public void updateLeftAutoCompletionBinding() {
+        if (leftAutoCompletionBinding != null) {
+            leftAutoCompletionBinding.dispose();
+        }
+        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
+                ControllerMediator.getInstance().getNonterminalCopy());
+    }
+
     public void setRight(Expression expression) {
         StringBuilder sb = new StringBuilder(64);
         for (ProductionSymbol symbol : expression.getValue()) {
             String string = symbol.getValue();
             if (string.length() > 1) {
-                sb.append('`');
+                sb.append('<');
                 sb.append(string);
-                sb.append('`');
+                sb.append('>');
             } else {
                 sb.append(string);
             }
@@ -109,5 +133,12 @@ public final class ExpressionHBox extends HBox {
         }
         return null;
     }
+
+//    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<Nonterminal>>
+//        getNonterminalSuggestionProvider() {
+//        return request -> {
+//            String input = request.getUserText();
+//        };
+//    }
 
 }
