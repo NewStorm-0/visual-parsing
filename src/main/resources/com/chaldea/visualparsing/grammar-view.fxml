@@ -3,48 +3,105 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="topVBox" prefHeight="379.0" prefWidth="586.0" spacing="10.0" stylesheets="@./css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.GrammarViewController">
+<VBox fx:id="topVBox" prefHeight="379.0" prefWidth="790.0" spacing="10.0" style="-fx-background-color: a8989b;" stylesheets="@./css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.GrammarViewController">
     <children>
-        <Button fx:id="addExpressionButton" disable="true" mnemonicParsing="false" onAction="#addExpression" text="增加产生式" textAlignment="CENTER" />
-        <ScrollPane fx:id="grammarScrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" prefHeight="318.0" prefWidth="572.0">
-            <content>
-                <VBox fx:id="scrollVBox" prefHeight="159.0" prefWidth="572.0" spacing="10.0">
-                    <children>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
-                            <TextField editable="false" text="1234567890987654321234567890" />
-                            <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
-                                <font>
-                                    <Font name="System Bold" size="20.0" />
-                                </font>
-                            </Label>
-                            <TextField editable="false" text="ADC" />
-                            <Button mnemonicParsing="false" text="编辑" />
-                            <Button mnemonicParsing="false" text="删除" />
+      <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="770.0" spacing="30.0" style="-fx-background-color: #D97FA7;">
+         <children>
+              <Button fx:id="addExpressionButton" disable="true" mnemonicParsing="false" onAction="#addExpression" text="增加产生式" textAlignment="CENTER" />
+            <Label fx:id="startSymbolLabel" text="开始符号：">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <SplitPane fx:id="splitPane" dividerPositions="0.5321459600347525" prefHeight="328.0" prefWidth="692.0" style="-fx-background-color: green;">
+        <items>
+              <ScrollPane fx:id="grammarScrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" prefHeight="318.0" prefWidth="572.0">
+               <content>
+                      <VBox fx:id="scrollVBox" prefHeight="325.0" prefWidth="305.0" spacing="10.0">
+                          <children>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0" style="-fx-background-color: pink;">
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="1234567890987654321234567890" />
+                                  <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
+                                      <font>
+                                          <Font name="System Bold" size="20.0" />
+                                      </font>
+                                  </Label>
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="81.0" text="ADC" />
+                                  <Button mnemonicParsing="false" text="编辑" />
+                                  <Button mnemonicParsing="false" text="删除" />
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="E" />
+                                  <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
+                                      <font>
+                                          <Font name="System Bold" size="20.0" />
+                                      </font>
+                                  </Label>
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="82.0" text="ADC" />
+                                  <Button mnemonicParsing="false" text="编辑" />
+                                  <Button mnemonicParsing="false" text="删除" />
+                              </HBox>
+                          </children>
+                          <padding>
+                              <Insets left="5.0" top="5.0" />
+                          </padding>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                      </VBox>
+               </content>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+              </ScrollPane>
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="325.0" prefWidth="315.0" style="-fx-background-color: purple;">
+               <children>
+                  <VBox fx:id="nonterminalVBox" alignment="TOP_CENTER" prefHeight="325.0" prefWidth="210.0" spacing="5.0" style="-fx-background-color: olive;">
+                     <children>
+                        <Label text="非终结符">
+                           <font>
+                              <Font name="System Bold" size="24.0" />
+                           </font>
+                        </Label>
+                        <ListView fx:id="nonterminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: silver;" />
+                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="191.0" spacing="20.0">
+                           <children>
+                              <Button fx:id="nonterminalNewButton" disable="true" mnemonicParsing="false" onAction="#newNonterminal" text="新增" />
+                              <Button fx:id="nonterminalDeleteButton" disable="true" mnemonicParsing="false" onAction="#deleteNonterminal" text="删除" />
+                           </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
-                            <TextField editable="false" text="E" />
-                            <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
-                                <font>
-                                    <Font name="System Bold" size="20.0" />
-                                </font>
-                            </Label>
-                            <TextField editable="false" text="ADC" />
-                            <Button mnemonicParsing="false" text="编辑" />
-                            <Button mnemonicParsing="false" text="删除" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="terminalVBox" alignment="TOP_CENTER" prefHeight="325.0" prefWidth="210.0" spacing="5.0" style="-fx-background-color: teal;">
+                     <children>
+                        <Label text="终结符">
+                           <font>
+                              <Font name="System Bold" size="24.0" />
+                           </font>
+                        </Label>
+                        <ListView fx:id="terminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: grey;" />
+                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="20.0">
+                           <children>
+                              <Button fx:id="terminalNewButton" disable="true" mnemonicParsing="false" onAction="#newTerminal" text="新增" />
+                              <Button fx:id="terminalDeleteButton" disable="true" mnemonicParsing="false" onAction="#deleteTerminal" text="删除" />
+                           </children>
                         </HBox>
-                    </children>
-                    <padding>
-                        <Insets left="5.0" />
-                    </padding>
-                </VBox>
-            </content>
-        </ScrollPane>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+        </items>
+      </SplitPane>
     </children>
     <padding>
         <Insets left="10.0" right="10.0" top="10.0" />

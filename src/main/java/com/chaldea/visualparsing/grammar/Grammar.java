@@ -36,11 +36,24 @@ public class Grammar implements Serializable {
 
     /**
      * Instantiates a new Grammar.
+     *
+     * @param start 开始符号
      */
-    public Grammar() {
-        productions = new ArrayList<>();
-        nonterminals = new HashSet<>();
-        terminals = new HashSet<>();
+    public Grammar(String start) {
+        this(new Nonterminal(start));
+    }
+
+    /**
+     * Instantiates a new Grammar.
+     *
+     * @param start the start
+     */
+    public Grammar(Nonterminal start) {
+        productions = new ArrayList<>(8);
+        nonterminals = new HashSet<>(8);
+        terminals = new HashSet<>(8);
+        nonterminals.add(start);
+        startSymbol = start;
     }
 
     /**
@@ -123,15 +136,25 @@ public class Grammar implements Serializable {
      * Add terminal.
      *
      * @param symbol the symbol
+     * @throws RepeatedSymbolException 抛出异常
      */
     public void addTerminal(Terminal symbol) {
         if (terminals.contains(symbol)) {
             throw new RepeatedSymbolException("已经包含该终结符");
         }
         if (nonterminals.contains(new Nonterminal(symbol.getValue()))) {
-            throw new RepeatedSymbolException("非终结符集合中已经包含该终结符");
+            throw new RepeatedSymbolException("非终结符集合中已经包含该符号");
         }
         terminals.add(symbol);
+    }
+
+    /**
+     * Add terminal.
+     *
+     * @param symbol the symbol
+     */
+    public void addTerminal(String symbol) {
+        addTerminal(new Terminal(symbol));
     }
 
     /**
@@ -148,15 +171,24 @@ public class Grammar implements Serializable {
      * Add nonterminal.
      *
      * @param symbol the symbol
+     * @throws RepeatedSymbolException 抛出异常
      */
     public void addNonterminal(Nonterminal symbol) {
         if (terminals.contains(new Terminal(symbol.getValue()))) {
-            throw new RepeatedSymbolException("终结符集合已经包含该非终结符");
+            throw new RepeatedSymbolException("终结符集合已经包含该符号");
         }
         if (nonterminals.contains(new Nonterminal(symbol.getValue()))) {
             throw new RepeatedSymbolException("已经包含该非终结符");
         }
         nonterminals.add(symbol);
+    }
+
+    /**
+     * Add nonterminal
+     * @param symbol the symbol
+     */
+    public void addNonterminal(String symbol) {
+        addNonterminal(new Nonterminal(symbol));
     }
 
     /**
@@ -266,6 +298,9 @@ public class Grammar implements Serializable {
     public String toString() {
         return "Grammar{" +
                 "productions=" + productions +
+                ", nonterminals=" + nonterminals +
+                ", terminals=" + terminals +
+                ", startSymbol=" + startSymbol +
                 '}';
     }
 

@@ -32,7 +32,9 @@ public final class ExpressionHBox extends HBox {
         this.setFillHeight(false);
         this.setSpacing(15.0);
         left.setEditable(false);
+        left.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
         right.setEditable(false);
+        right.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
         Label rightArrow = new Label("➡");
         rightArrow.setScaleX(2.0);
         rightArrow.setScaleY(1.2);

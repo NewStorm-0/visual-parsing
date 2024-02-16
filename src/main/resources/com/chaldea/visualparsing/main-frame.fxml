@@ -7,12 +7,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.VBox?>
 
-<!--该界面是重构代码时所写，想要将文法展示界面与窗口逻辑代码分离，未完工-->
-<VBox fx:id="topVBox" alignment="TOP_CENTER" maxHeight="Infinity" maxWidth="Infinity"
-      minHeight="300.0" minWidth="400.0" prefHeight="485.0" prefWidth="613.0" spacing="5.0"
-      stylesheets="@./css/default1.css" xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.chaldea.visualparsing.controller.MainFrameController">
+<VBox fx:id="topVBox" alignment="TOP_CENTER" maxHeight="Infinity" maxWidth="Infinity" minHeight="400.0" minWidth="800.0" prefHeight="485.0" prefWidth="613.0" spacing="5.0" stylesheets="@./css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.MainFrameController">
    <children>
       <MenuBar styleClass="custom-menu-bar">
          <menus>

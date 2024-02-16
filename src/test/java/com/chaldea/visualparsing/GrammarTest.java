@@ -25,7 +25,12 @@ public class GrammarTest {
 
     @Test
     void testGrammarTest() {
-        Grammar grammar = new Grammar();
+        Grammar grammar = new Grammar("START");
+        grammar.addNonterminal("K");
+        grammar.addNonterminal("DDD");
+        grammar.addNonterminal("B");
+        grammar.addTerminal("ok");
+        grammar.addTerminal("hahaha");
         grammar.addExpression(new Nonterminal("DDD"), new Expression(
                 new ProductionSymbol[]{new Nonterminal("B"), new Terminal("ok")}
         ));

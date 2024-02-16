@@ -2,8 +2,7 @@ package com.chaldea.visualparsing.controller;
 
 import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.Main;
-import com.chaldea.visualparsing.controller.GrammarViewController;
-import com.chaldea.visualparsing.gui.ExceptionDialogUtils;
+import com.chaldea.visualparsing.gui.DialogShower;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonBar;
@@ -69,7 +68,7 @@ public class MainFrameController {
             dialog.showAndWait();
         } catch (IOException e) {
             logger.error("", e);
-            ExceptionDialogUtils.showExceptionDialog(e);
+            DialogShower.showExceptionDialog(e);
         }
     }
 

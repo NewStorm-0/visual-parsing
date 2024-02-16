@@ -1,25 +1,25 @@
 package com.chaldea.visualparsing.controller;
 
 import com.chaldea.visualparsing.ControllerMediator;
-import com.chaldea.visualparsing.Main;
+import com.chaldea.visualparsing.exception.grammar.RepeatedSymbolException;
 import com.chaldea.visualparsing.grammar.*;
-import com.chaldea.visualparsing.gui.ExceptionDialogUtils;
+import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.gui.ExpressionHBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +29,29 @@ public class GrammarViewController {
     @FXML
     protected VBox scrollVBox;
     @FXML
+    protected SplitPane splitPane;
+    @FXML
     protected ScrollPane grammarScrollPane;
     @FXML
     protected Button addExpressionButton;
+    @FXML
+    protected ListView<Nonterminal> nonterminalListView;
+    @FXML
+    protected ListView<Terminal> terminalListView;
+    @FXML
+    protected VBox nonterminalVBox;
+    @FXML
+    private VBox terminalVBox;
+    @FXML
+    protected Button nonterminalNewButton;
+    @FXML
+    protected Button nonterminalDeleteButton;
+    @FXML
+    protected Button terminalNewButton;
+    @FXML
+    protected Button terminalDeleteButton;
+    @FXML
+    protected Label startSymbolLabel;
     private List<ExpressionHBox> expressionHBoxList;
     private Grammar grammar;
     private static final Logger logger = LoggerFactory.getLogger(GrammarViewController.class);
@@ -49,8 +69,35 @@ public class GrammarViewController {
 
     @FXML
     public void initialize() {
-        VBox vbox = ControllerMediator.getInstance().getMainFrameController().topVBox;
-        grammarScrollPane.prefHeightProperty().bind(vbox.heightProperty().subtract(125));
+        nonterminalListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Nonterminal nonterminal, boolean empty) {
+                super.updateItem(nonterminal, empty);
+                if (empty || nonterminal == null) {
+                    setText(null);
+                } else {
+                    setText(nonterminal.getValue());
+                }
+            }
+        });
+        terminalListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Terminal terminal, boolean empty) {
+                super.updateItem(terminal, empty);
+                if (empty || terminal == null) {
+                    setText(null);
+                } else {
+                    setText(terminal.getValue());
+                }
+            }
+        });
+        splitPane.prefHeightProperty().bind(topVBox.heightProperty().subtract(60));
+        splitPane.getDividers().forEach(this::splitPaneDividersHandler);
+        grammarScrollPane.prefWidthProperty().bind(topVBox.widthProperty().subtract(20));
+        nonterminalListView.prefHeightProperty().bind(splitPane.heightProperty().subtract(90));
+        nonterminalListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        terminalListView.prefHeightProperty().bind(splitPane.heightProperty().subtract(90));
+        terminalListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     /**
@@ -69,6 +116,7 @@ public class GrammarViewController {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 saveGrammar();
+                unsaved = false;
                 logger.debug("OK了，家人们");
             } else if (result.isPresent()) {
                 unsaved = false;
@@ -79,7 +127,17 @@ public class GrammarViewController {
         grammar = null;
         grammarFile = null;
         scrollVBox.getChildren().clear();
-        expressionHBoxList = new ArrayList<>(32);
+//        nonterminalListView.getItems().clear();
+//        terminalListView.getItems().clear();
+        nonterminalListView.setItems(null);
+        terminalListView.setItems(null);
+        expressionHBoxList.clear();
+        startSymbolLabel.setText("开始符号：");
+        addExpressionButton.setDisable(true);
+        nonterminalNewButton.setDisable(true);
+        nonterminalDeleteButton.setDisable(true);
+        terminalNewButton.setDisable(true);
+        terminalDeleteButton.setDisable(true);
     }
 
     /**
@@ -87,10 +145,21 @@ public class GrammarViewController {
      */
     public void createGrammar() {
         cleanupPreviousData();
-        grammar = new Grammar();
+        Optional<String> startSymbolOptional =
+                DialogShower.showInputDialog("请输入开始符号", "非终结符：");
+        if (startSymbolOptional.isEmpty()) {
+            return;
+        }
+        grammar = new Grammar(startSymbolOptional.get());
         ControllerMediator.getInstance().setStageTitlePrefix("未命名文法");
-        scrollVBox.getChildren().addAll(expressionHBoxList);
+        startSymbolLabel.setText("开始符号：" + startSymbolOptional.get());
+//        scrollVBox.getChildren().addAll(expressionHBoxList);
+        initializeListView(grammar.getNonterminals(), grammar.getTerminals());
         addExpressionButton.setDisable(false);
+        nonterminalNewButton.setDisable(false);
+        nonterminalDeleteButton.setDisable(false);
+        terminalNewButton.setDisable(false);
+        terminalDeleteButton.setDisable(false);
     }
 
     /**
@@ -105,7 +174,8 @@ public class GrammarViewController {
                 new FileChooser.ExtensionFilter("所有文件", "*.*"),
                 new FileChooser.ExtensionFilter("文法文件", "*.gra")
         );
-        grammarFile = fileChooser.showOpenDialog(topVBox.getScene().getWindow());
+        grammarFile = fileChooser.showOpenDialog(ControllerMediator
+                .getInstance().getScene().getWindow());
         // 判断用户有没有选择文件
         if (grammarFile == null) {
             logger.debug("用户没有选择文件");
@@ -115,7 +185,6 @@ public class GrammarViewController {
         try {
             grammar = GrammarReaderWriter.readGrammarFromFile(grammarFile);
             logger.debug(grammar.toString());
-            ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
             // 将文法中所有产生式进行添加
             for (Production production : grammar.getProductions()) {
                 Nonterminal head = production.getHead();
@@ -123,25 +192,26 @@ public class GrammarViewController {
                     expressionHBoxList.add(new ExpressionHBox(head, expression));
                 }
             }
+            // 添加所有非终结符和终结符
+            initializeListView(grammar.getNonterminals(), grammar.getTerminals());
+            // 其余操作
+            ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
+            startSymbolLabel.setText("开始符号：" + grammar.getStartSymbol().getValue());
             scrollVBox.getChildren().addAll(expressionHBoxList);
             addExpressionButton.setDisable(false);
+            nonterminalNewButton.setDisable(false);
+            nonterminalDeleteButton.setDisable(false);
+            terminalNewButton.setDisable(false);
+            terminalDeleteButton.setDisable(false);
         } catch (FileNotFoundException e) {
             grammarFile = null;
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("错误");
-            alert.setHeaderText("文件不存在");
-            alert.setContentText("无法读取文件！");
-            alert.showAndWait();
+            DialogShower.showErrorDialog("文件不存在", "无法读取文件！");
         } catch (StreamCorruptedException e) {
             grammarFile = null;
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("错误");
-            alert.setHeaderText("读取文法错误");
-            alert.setContentText("获取文法失败！");
-            alert.showAndWait();
+            DialogShower.showErrorDialog("读取文法错误", "获取文法失败！");
         } catch (IOException e) {
             grammarFile = null;
-            ExceptionDialogUtils.showExceptionDialog(e);
+            DialogShower.showExceptionDialog(e);
             logger.error("打开文法文件错误", e);
         }
     }
@@ -163,7 +233,8 @@ public class GrammarViewController {
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("文法文件 (*.gra)", "*.gra")
             );
-            grammarFile = fileChooser.showSaveDialog(topVBox.getScene().getWindow());
+            grammarFile = fileChooser.showSaveDialog(ControllerMediator
+                    .getInstance().getScene().getWindow());
             // 判断用户有没有选择文件
             if (grammarFile == null) {
                 return;
@@ -203,4 +274,198 @@ public class GrammarViewController {
         // TODO:
         expressionHBoxList.add(new ExpressionHBox());
     }
+
+    /**
+     * 新增非终结符
+     */
+    @FXML
+    protected void newNonterminal() {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.setTitle("提示");
+        inputDialog.setHeaderText("请输入一个非终结符");
+        inputDialog.setContentText("符号：");
+        inputDialog.showAndWait().ifPresent(symbol -> {
+            if (symbol.isBlank()) {
+                DialogShower.showErrorDialog("输入不可以为空");
+                return;
+            }
+            try {
+                nonterminalListView.getItems().add(new Nonterminal(symbol));
+            } catch (RepeatedSymbolException e) {
+                DialogShower.showErrorDialog(e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 删除非终结符
+     */
+    @FXML
+    protected void deleteNonterminal() {
+        Nonterminal removedNonterminal =
+                nonterminalListView.getSelectionModel().getSelectedItem();
+        nonterminalListView.getItems().remove(removedNonterminal);
+        logger.debug("Grammar Nonterminals: {}", grammar.getNonterminals());
+    }
+
+    /**
+     * 新增终结符
+     */
+    @FXML
+    protected void newTerminal() {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.setTitle("提示");
+        inputDialog.setHeaderText("请输入一个终结符");
+        inputDialog.setContentText("符号：");
+        inputDialog.showAndWait().ifPresent(symbol -> {
+            if (symbol.isBlank()) {
+                DialogShower.showErrorDialog("输入不可以为空");
+                return;
+            }
+            try {
+                terminalListView.getItems().add(new Terminal(symbol));
+            } catch (RepeatedSymbolException e) {
+                DialogShower.showErrorDialog(e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 删除终结符
+     */
+    @FXML
+    protected void deleteTerminal() {
+        Terminal removedTerminal = terminalListView.getSelectionModel().getSelectedItem();
+        terminalListView.getItems().remove(removedTerminal);
+        logger.debug("Grammar Terminals: {}", grammar.getTerminals());
+    }
+
+    /**
+     * 初始化 nonterminalListView 和 terminalListView
+     *
+     * @param nonterminalCollection 非终结符集合
+     * @param terminalCollection    终结符集合
+     */
+    private void initializeListView(Collection<Nonterminal> nonterminalCollection,
+                                    Collection<Terminal> terminalCollection) {
+        // 添加所有非终结符
+        ObservableList<Nonterminal> nonterminalObservableList;
+        nonterminalObservableList =
+                FXCollections.observableArrayList(nonterminalCollection);
+        nonterminalObservableList.addListener(this::nonterminalListHandler);
+        nonterminalListView.setItems(nonterminalObservableList);
+        // 添加所有终结符
+        ObservableList<Terminal> terminalObservableList;
+        terminalObservableList =
+                FXCollections.observableArrayList(terminalCollection);
+        terminalObservableList.addListener(this::terminalListHandler);
+        terminalListView.setItems(terminalObservableList);
+    }
+
+    /**
+     * 监听非终结符数据改变
+     *
+     * @param change 变化
+     */
+    private void nonterminalListHandler(
+            ListChangeListener.Change<? extends Nonterminal> change) {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                handleAddedNonterminals(change);
+            }
+            if (change.wasRemoved()) {
+                handleRemovedNonterminals(change);
+            }
+        }
+    }
+
+    /**
+     * 监听终结符数据改变
+     *
+     * @param change 变化
+     */
+    private void terminalListHandler(
+            ListChangeListener.Change<? extends Terminal> change) {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                handleAddedTerminals(change);
+            }
+            if (change.wasRemoved()) {
+                handleRemovedTerminals(change);
+            }
+        }
+    }
+
+    /**
+     * 设置分割条最小最大宽度，动态调整符号展示部分宽度
+     *
+     * @param divider 分割条
+     */
+    private void splitPaneDividersHandler(SplitPane.Divider divider) {
+        // 防止 divider.setPosition 再次引起监听器动作
+        AtomicBoolean stop = new AtomicBoolean(false);
+        divider.positionProperty().addListener(((observable, oldValue, newValue) -> {
+            if (stop.get()) {
+                return;
+            }
+            // 设置分割条最小最大宽度
+            double minDividerWidth = 350;
+            double maxDividerWidth = topVBox.getWidth() - 250;
+            double minPosition = minDividerWidth / splitPane.getWidth();
+            double maxPosition = maxDividerWidth / splitPane.getWidth();
+            stop.set(true);
+            if (newValue.doubleValue() < minPosition) {
+                divider.setPosition(minPosition);
+            } else if (newValue.doubleValue() > maxPosition) {
+                divider.setPosition(maxPosition);
+            }
+            stop.set(false);
+            // 动态调整符号展示部分
+            double rightWidth = splitPane.getWidth() * (1 - divider.getPosition());
+            nonterminalVBox.setPrefWidth(rightWidth / 2);
+            terminalVBox.setPrefWidth(rightWidth / 2);
+        }));
+    }
+
+    private void handleAddedNonterminals(ListChangeListener.Change<? extends Nonterminal> change) {
+        List<Nonterminal> addedNonterminals = change.getAddedSubList()
+                .stream()
+                .map(e -> (Nonterminal) e)
+                .toList();
+        for (Nonterminal n : addedNonterminals) {
+            try {
+                grammar.addNonterminal(n);
+            } catch (RepeatedSymbolException e) {
+                DialogShower.showErrorDialog(e.getMessage());
+            }
+        }
+    }
+
+    private void handleRemovedNonterminals(ListChangeListener.Change<? extends Nonterminal> change) {
+        List<Nonterminal> removedNonterminals = change.getRemoved()
+                .stream()
+                .map(e -> (Nonterminal) e)
+                .toList();
+
+        removedNonterminals.forEach(grammar.getNonterminals()::remove);
+    }
+
+    private void handleAddedTerminals(ListChangeListener.Change<? extends Terminal> change) {
+        List<Terminal> addedTerminals = change.getAddedSubList()
+                .stream().map(e -> (Terminal) e).toList();
+        for (Terminal t : addedTerminals) {
+            try {
+                grammar.addTerminal(t);
+            } catch (RepeatedSymbolException e) {
+                DialogShower.showErrorDialog(e.getMessage());
+            }
+        }
+    }
+
+    private void handleRemovedTerminals(ListChangeListener.Change<? extends Terminal> change) {
+        List<Terminal> removedTerminals = change.getRemoved()
+                .stream().map(e -> (Terminal) e).toList();
+        removedTerminals.forEach(grammar.getTerminals()::remove);
+    }
+
 }

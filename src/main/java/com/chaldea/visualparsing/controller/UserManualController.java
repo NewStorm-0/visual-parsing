@@ -1,15 +1,13 @@
 package com.chaldea.visualparsing.controller;
 
 import com.chaldea.visualparsing.ControllerMediator;
-import com.chaldea.visualparsing.Main;
-import com.chaldea.visualparsing.gui.ExceptionDialogUtils;
+import com.chaldea.visualparsing.gui.DialogShower;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 public class UserManualController {
@@ -41,7 +39,7 @@ public class UserManualController {
             text.setText(sb.toString());
         } catch (IOException e) {
             logger.error("", e);
-            ExceptionDialogUtils.showExceptionDialog(e);
+            DialogShower.showExceptionDialog(e);
         }
     }
 }
