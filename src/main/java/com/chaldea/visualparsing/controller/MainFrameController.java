@@ -54,6 +54,17 @@ public class MainFrameController {
     }
 
     /**
+     * Gets stage title prefix.
+     *
+     * @return the stage title prefix
+     */
+    public String getStageTitlePrefix() {
+        Stage stage = ((Stage) topVBox.getScene().getWindow());
+        int index = stage.getTitle().indexOf(TITLE_SUFFIX);
+        return stage.getTitle().substring(0, index);
+    }
+
+    /**
      * 打开用户手册对话框
      */
     @FXML

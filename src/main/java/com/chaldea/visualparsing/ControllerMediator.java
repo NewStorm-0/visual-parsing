@@ -60,6 +60,15 @@ public class ControllerMediator {
     }
 
     /**
+     * Gets stage title prefix.
+     *
+     * @return the stage title prefix
+     */
+    public String getStageTitlePrefix() {
+        return mainFrameController.getStageTitlePrefix();
+    }
+
+    /**
      * Gets grammar.
      *
      * @return the grammar
