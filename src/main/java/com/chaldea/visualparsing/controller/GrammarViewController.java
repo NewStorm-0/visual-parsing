@@ -20,7 +20,6 @@ import java.io.StreamCorruptedException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,13 @@ public class GrammarViewController {
     protected Button terminalDeleteButton;
     @FXML
     protected Label startSymbolLabel;
-    private List<ExpressionHBox> expressionHBoxList;
+    private ObservableList<ExpressionHBox> expressionHBoxList;
+
+    @Deprecated
+    public Grammar getGrammar() {
+        return grammar;
+    }
+
     private Grammar grammar;
     private static final Logger logger = LoggerFactory.getLogger(GrammarViewController.class);
     /**
@@ -66,7 +71,8 @@ public class GrammarViewController {
     private boolean unsaved = false;
 
     public GrammarViewController() {
-        expressionHBoxList = new ArrayList<>(32);
+        expressionHBoxList = FXCollections.observableArrayList();
+        expressionHBoxList.addListener(this::expressionHBoxListListener);
         ControllerMediator.getInstance().setGrammarViewController(this);
         logger.debug("已经注册GrammarViewController");
     }
@@ -188,7 +194,7 @@ public class GrammarViewController {
         logger.debug(grammarFile.getAbsolutePath());
         try {
             grammar = GrammarReaderWriter.readGrammarFromFile(grammarFile);
-            logger.debug(grammar.toString());
+            logger.debug("打开文法：{}", grammar);
             // 将文法中所有产生式进行添加
             for (Production production : grammar.getProductions()) {
                 Nonterminal head = production.getHead();
@@ -201,7 +207,6 @@ public class GrammarViewController {
             // 其余操作
             ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
             startSymbolLabel.setText("开始符号：" + grammar.getStartSymbol().getValue());
-            scrollVBox.getChildren().addAll(expressionHBoxList);
             addExpressionButton.setDisable(false);
             nonterminalNewButton.setDisable(false);
             nonterminalDeleteButton.setDisable(false);
@@ -259,6 +264,8 @@ public class GrammarViewController {
             try {
                 GrammarReaderWriter.writeGrammarToFile(grammar, grammarFile);
                 unsaved = false;
+                DialogShower.showInformationDialog("保存到文件成功");
+                logger.debug("保存文法：{}", grammar);
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("错误");
@@ -281,12 +288,58 @@ public class GrammarViewController {
     }
 
     /**
+     * Gets terminal copy.
+     *
+     * @return the terminal copy
+     */
+    public Set<Terminal> getTerminalCopy() {
+        return new HashSet<>(grammar.getTerminals());
+    }
+
+    /**
+     * Delete expressionHBox.
+     *
+     * @param expressionHBox the expression h box
+     */
+    public void deleteExpressionHBox(ExpressionHBox expressionHBox) {
+        expressionHBoxList.remove(expressionHBox);
+    }
+
+    public void addExpressionToGrammar(Nonterminal head, Expression body) {
+        grammar.addExpression(head, body);
+        unsaved = true;
+    }
+
+    public void deleteExpressionFromGrammar(Nonterminal head, Expression body) {
+        grammar.deleteExpression(head, body);
+        unsaved = true;
+    }
+
+    /**
      * 增加表达式
      */
     @FXML
-    protected void addExpression() {
-        // TODO:
-        expressionHBoxList.add(new ExpressionHBox());
+    protected void addExpressionHBox() {
+        if (expressionHBoxList.isEmpty()) {
+            expressionHBoxList.add(new ExpressionHBox());
+            return;
+        }
+        ExpressionHBox lastExpressionHBox = expressionHBoxList.get(expressionHBoxList.size() - 1);
+        if (lastExpressionHBox != null && lastExpressionHBox.isEmpty()) {
+            DialogShower.showWarningDialog("请在填写当前产生式后再添加新的表达式");
+            new Thread(() -> {
+                lastExpressionHBox.toWarningState();
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    DialogShower.showExceptionDialog(e);
+                }
+                lastExpressionHBox.toNormalState();
+            }).start();
+        } else {
+            expressionHBoxList.add(new ExpressionHBox());
+        }
+
     }
 
     /**
@@ -366,13 +419,13 @@ public class GrammarViewController {
         ObservableList<Nonterminal> nonterminalObservableList;
         nonterminalObservableList =
                 FXCollections.observableArrayList(nonterminalCollection);
-        nonterminalObservableList.addListener(this::nonterminalListHandler);
+        nonterminalObservableList.addListener(this::nonterminalListListener);
         nonterminalListView.setItems(nonterminalObservableList);
         // 添加所有终结符
         ObservableList<Terminal> terminalObservableList;
         terminalObservableList =
                 FXCollections.observableArrayList(terminalCollection);
-        terminalObservableList.addListener(this::terminalListHandler);
+        terminalObservableList.addListener(this::terminalListListener);
         terminalListView.setItems(terminalObservableList);
     }
 
@@ -381,7 +434,7 @@ public class GrammarViewController {
      *
      * @param change 变化
      */
-    private void nonterminalListHandler(
+    private void nonterminalListListener(
             ListChangeListener.Change<? extends Nonterminal> change) {
         while (change.next()) {
             if (change.wasAdded()) {
@@ -394,6 +447,7 @@ public class GrammarViewController {
             for (ExpressionHBox expressionHBox : expressionHBoxList) {
                 expressionHBox.updateLeftAutoCompletionBinding();
             }
+            unsaved = true;
         }
     }
 
@@ -402,7 +456,7 @@ public class GrammarViewController {
      *
      * @param change 变化
      */
-    private void terminalListHandler(
+    private void terminalListListener(
             ListChangeListener.Change<? extends Terminal> change) {
         while (change.next()) {
             if (change.wasAdded()) {
@@ -411,6 +465,7 @@ public class GrammarViewController {
             if (change.wasRemoved()) {
                 handleRemovedTerminals(change);
             }
+            unsaved = true;
         }
     }
 
@@ -484,6 +539,27 @@ public class GrammarViewController {
         List<Terminal> removedTerminals = change.getRemoved()
                 .stream().map(e -> (Terminal) e).toList();
         removedTerminals.forEach(grammar.getTerminals()::remove);
+    }
+
+    /**
+     * expressionHBoxList 监听器，向 scrollVBox 中动态增减 expressionHBox
+     * @param change the change
+     */
+    private void expressionHBoxListListener(
+            ListChangeListener.Change<? extends ExpressionHBox> change) {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                for (ExpressionHBox expressionHBox : change.getAddedSubList()) {
+                    scrollVBox.getChildren().add(expressionHBox);
+                }
+            }
+
+            if (change.wasRemoved()) {
+                for (ExpressionHBox expressionHBox : change.getRemoved()) {
+                    scrollVBox.getChildren().remove(expressionHBox);
+                }
+            }
+        }
     }
 
 }

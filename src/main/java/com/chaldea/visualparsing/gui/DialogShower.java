@@ -53,4 +53,20 @@ public class DialogShower {
         inputDialog.setContentText(contentText);
         return inputDialog.showAndWait();
     }
+
+    public static void showWarningDialog(String contentText) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("警告");
+        alert.setHeaderText("请您注意！");
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
+
+    public static void showInformationDialog(String contentText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("提示");
+        alert.setHeaderText("请查收！");
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
 }

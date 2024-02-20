@@ -34,6 +34,12 @@ public class Expression implements Serializable {
         return value[index];
     }
 
+    @Deprecated
+    public boolean isEmpty() {
+        // TODO: 如何处理表达式体为空
+        return value == null || value.length == 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -219,6 +219,8 @@ public class Grammar implements Serializable {
      * @param head the head
      * @param exp  the exp
      * @throws EmptyHeadProductionException 产生式头不能为空
+     * @throws UnknownSymbolException 产生式头部不在非终结符定义中
+     * @throws IllegalSymbolException 表达式中含有非法符号
      */
     public void addExpression(Nonterminal head, Expression exp) throws EmptyHeadProductionException {
         if (head == null) {

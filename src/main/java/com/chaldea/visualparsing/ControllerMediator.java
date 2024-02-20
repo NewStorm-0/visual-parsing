@@ -5,6 +5,7 @@ import com.chaldea.visualparsing.controller.MainFrameController;
 import com.chaldea.visualparsing.controller.UserManualController;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
+import com.chaldea.visualparsing.grammar.Terminal;
 import javafx.scene.Scene;
 
 import java.util.Set;
@@ -65,11 +66,15 @@ public class ControllerMediator {
      */
     @Deprecated
     public Grammar getGrammar() {
-        return null;
+        return grammarViewController.getGrammar();
     }
 
     public Set<Nonterminal> getNonterminalCopy() {
         return grammarViewController.getNonterminalCopy();
+    }
+
+    public Set<Terminal> getTerminalCopy() {
+        return grammarViewController.getTerminalCopy();
     }
 
     /**

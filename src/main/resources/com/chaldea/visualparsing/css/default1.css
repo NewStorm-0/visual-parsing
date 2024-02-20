@@ -9,3 +9,9 @@
 .scroll-pane {
     -fx-background-color: #b4fbd0;
 }
+
+.warning {
+    -fx-border-color: #d13e3e;
+    -fx-border-width: 0.8pt;
+    -fx-border-radius: 2pt;
+}

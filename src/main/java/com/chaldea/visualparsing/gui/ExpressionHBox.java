@@ -1,11 +1,11 @@
 package com.chaldea.visualparsing.gui;
 
 import com.chaldea.visualparsing.ControllerMediator;
-import com.chaldea.visualparsing.grammar.Expression;
-import com.chaldea.visualparsing.grammar.Nonterminal;
-import com.chaldea.visualparsing.grammar.ProductionSymbol;
+import com.chaldea.visualparsing.exception.grammar.IllegalSymbolException;
+import com.chaldea.visualparsing.exception.grammar.RepeatedProductionException;
+import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
+import com.chaldea.visualparsing.grammar.*;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -16,10 +16,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import org.controlsfx.control.textfield.TextFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,26 +31,47 @@ import java.util.regex.Pattern;
  */
 public class ExpressionHBox extends HBox {
     public AutoCompletionBinding<Nonterminal> leftAutoCompletionBinding;
-    private final TextField left = new TextField();
-    private final TextField right = new TextField();
+    @Deprecated
+    public AutoCompletionBinding<ProductionSymbol> rightAutoCompletionBinding;
+    private final TextField leftTextField = new TextField();
+    private final TextField rightTextField = new TextField();
     private final Button editButton = new Button("编辑");
     private final Button deleteButton = new Button("删除");
+
+    /**
+     * The Expression head. 表达当前文法中这个表达式对应的头部
+     * 在点击保存按钮后，会改变
+     * <p>用于记录在创建时或用户最近保存时的头和体，防止用户在编辑一半时
+     * 且没有保存的情况下，对表达式进行删除而发生错误</p>
+     */
+    private Nonterminal expressionHead;
+
+    /**
+     * The Expression body. 表达当前文法中这个表达式对应的体
+     * 在点击保存按钮后会改变
+     */
+    private Expression expressionBody;
+
+    private static final Logger logger = LoggerFactory.getLogger(ExpressionHBox.class);
 
     public ExpressionHBox() {
         super();
         this.setAlignment(Pos.CENTER_LEFT);
         this.setFillHeight(false);
         this.setSpacing(15.0);
-//        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
-//                getNonterminalSuggestionProvider(), getNonterminalStringConverter());
-        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
+        // 设置 头输入框 与 体输入框 自动提示
+        leftAutoCompletionBinding = TextFields.bindAutoCompletion(leftTextField,
                 ControllerMediator.getInstance().getNonterminalCopy());
-        left.setEditable(false);
-        left.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
-        left.setPromptText("输入产生式头(非终结符)");
-        right.setEditable(false);
-        right.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
-        right.setPromptText("输入产生式体");
+//        rightAutoCompletionBinding = TextFields.bindAutoCompletion(right,
+//                rightSuggestionProvider());
+
+        leftTextField.setEditable(false);
+        leftTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
+        leftTextField.setPromptText("输入产生式头(非终结符)");
+        rightTextField.setEditable(false);
+        rightTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
+        rightTextField.setPromptText("输入产生式体");
+
         Label rightArrow = new Label("➡");
         rightArrow.setScaleX(2.0);
         rightArrow.setScaleY(1.2);
@@ -55,17 +79,48 @@ public class ExpressionHBox extends HBox {
         rightArrow.setFont(new Font("System Bold", 20.0));
         editButton.setOnAction(this::editOrSave);
         deleteButton.setOnAction(this::delete);
-        this.getChildren().addAll(left, rightArrow, right, editButton, deleteButton);
+        this.getChildren().addAll(leftTextField, rightArrow, rightTextField, editButton, deleteButton);
     }
 
     public ExpressionHBox(Nonterminal head, Expression expression) {
         this();
-        setLeft(head);
-        setRight(expression);
+        setLeftTextField(head);
+        setRightTextField(expression);
     }
 
-    public void setLeft(Nonterminal head) {
-        left.setText(head.getValue());
+    /**
+     * 判断当前左部与右边内容是否为空
+     *
+     * @return 当左部或右边内容为空则返回 true，否则返回 false
+     */
+    public boolean isEmpty() {
+        return leftTextField.getText().isEmpty() || rightTextField.getText().isEmpty();
+    }
+
+    /**
+     * Sets left.
+     *
+     * @param head the head
+     */
+    public void setLeftTextField(Nonterminal head) {
+        expressionHead = head;
+        leftTextField.setText(head.getValue());
+    }
+
+    /**
+     * To warning state.
+     */
+    public void toWarningState() {
+        leftTextField.getStyleClass().add("warning");
+        rightTextField.getStyleClass().add("warning");
+    }
+
+    /**
+     * To normal state.
+     */
+    public void toNormalState() {
+        leftTextField.getStyleClass().remove("warning");
+        rightTextField.getStyleClass().remove("warning");
     }
 
     /**
@@ -75,11 +130,12 @@ public class ExpressionHBox extends HBox {
         if (leftAutoCompletionBinding != null) {
             leftAutoCompletionBinding.dispose();
         }
-        leftAutoCompletionBinding = TextFields.bindAutoCompletion(left,
+        leftAutoCompletionBinding = TextFields.bindAutoCompletion(leftTextField,
                 ControllerMediator.getInstance().getNonterminalCopy());
     }
 
-    public void setRight(Expression expression) {
+    public void setRightTextField(Expression expression) {
+        expressionBody = expression;
         StringBuilder sb = new StringBuilder(64);
         for (ProductionSymbol symbol : expression.getValue()) {
             String string = symbol.getValue();
@@ -91,54 +147,145 @@ public class ExpressionHBox extends HBox {
                 sb.append(string);
             }
         }
-        right.setText(sb.toString());
+        rightTextField.setText(sb.toString());
     }
 
     private void editOrSave(ActionEvent actionEvent) {
         if ("编辑".equals(editButton.getText())) {
-            left.setEditable(true);
-            right.setEditable(true);
+            leftTextField.setEditable(true);
+            rightTextField.setEditable(true);
             editButton.setText("保存");
         } else {
             // 保存文法
-
-            left.setEditable(false);
-            right.setEditable(false);
-            editButton.setText("编辑");
+            try {
+                Nonterminal head = parseLeftTextField();
+                Expression body = parseRightTextField();
+                logger.debug(body.toString());
+                ControllerMediator.getInstance().getGrammarViewController()
+                        .addExpressionToGrammar(head, body);
+                // 保存成功
+                leftTextField.setEditable(false);
+                rightTextField.setEditable(false);
+                editButton.setText("编辑");
+                expressionHead = head;
+                expressionBody = body;
+                DialogShower.showInformationDialog("保存成功");
+            } catch (UnknownSymbolException e) {
+                DialogShower.showErrorDialog("表达式体中含有未定义符号："
+                        + e.getMessage());
+            } catch (IllegalSymbolException e) {
+                DialogShower.showErrorDialog(e.getMessage() + "不在非终结符中");
+            } catch (RepeatedProductionException e) {
+                DialogShower.showErrorDialog("重复的表达式");
+            }
         }
     }
 
     private void delete(ActionEvent actionEvent) {
-
+        try {
+            if (expressionHead != null && expressionBody != null) {
+                // 若条件中两个变量都不为 null，则说明对应的内容已经保存到文法中，需要删除
+                ControllerMediator.getInstance().getGrammarViewController()
+                        .deleteExpressionFromGrammar(expressionHead, expressionBody);
+            }
+            ControllerMediator.getInstance().getGrammarViewController()
+                    .deleteExpressionHBox(this);
+        } catch (UnknownSymbolException e) {
+            DialogShower.showErrorDialog("表达式体中含有未定义符号："
+                    + e.getMessage());
+        } catch (IllegalSymbolException e) {
+            DialogShower.showErrorDialog(e.getMessage() + "不在非终结符中");
+        }
     }
 
     /**
-     * 根据``对字符串进行分割，并构造{@link com.chaldea.visualparsing.grammar.Expression}对象
-     * @param input 字符串
+     * 根据<>对字符串进行分割，并构造{@link com.chaldea.visualparsing.grammar.Expression}对象
+     *
      * @return Expression 对象
      */
-    private Expression parseRight(String input) {
+    private Expression parseRightTextField() {
+        String input = rightTextField.getText();
         List<ProductionSymbol> productionSymbolList = new ArrayList<>(input.length());
-        // 定义正则表达式匹配被 `` 括住的部分
-        Pattern pattern = Pattern.compile("\\[([^<>\\{\\}]+?)\\]");
+        // 定义正则表达式匹配被 <> 括住的部分
+        Pattern pattern = Pattern.compile("<([^<>]+?)>");
         Matcher matcher = pattern.matcher(input);
         int previousEnd = 0;
         while (matcher.find()) {
             int start = matcher.start();
             int end = matcher.end();
             for (int i = previousEnd; i < start; i++) {
-                // TODO:
-//                productionSymbolList.add()
+                addExactSymbolToList(productionSymbolList,
+                        String.valueOf(input.charAt(i)));
             }
+            previousEnd = end;
+            addExactSymbolToList(productionSymbolList,
+                    input.substring(start + 1, end - 1));
         }
-        return null;
+        for (int i = previousEnd; i < input.length(); i++) {
+            addExactSymbolToList(productionSymbolList,
+                    String.valueOf(input.charAt(i)));
+        }
+        return new Expression(productionSymbolList.toArray(ProductionSymbol[]::new));
     }
 
-//    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<Nonterminal>>
-//        getNonterminalSuggestionProvider() {
-//        return request -> {
-//            String input = request.getUserText();
-//        };
-//    }
+    private Nonterminal parseLeftTextField() {
+        Set<Nonterminal> nonterminalSet = ControllerMediator.getInstance().getNonterminalCopy();
+        Nonterminal nonterminalSymbol = new Nonterminal(leftTextField.getText());
+        if (nonterminalSet.contains(nonterminalSymbol)) {
+            return nonterminalSymbol;
+        } else {
+            throw new IllegalSymbolException(nonterminalSymbol.toString());
+        }
+    }
+
+    /**
+     * 获取文法符号是非终结符还是终结符
+     * @param symbol 文法符号
+     * @return Nonterminal.class 或者 Terminal.class 或 null
+     */
+    @Deprecated
+    private Class<?> getSymbolClass(String symbol) {
+        Set<Terminal> terminals = ControllerMediator.getInstance().getTerminalCopy();
+        Set<Nonterminal> nonterminals = ControllerMediator.getInstance().getNonterminalCopy();
+        if (terminals.contains(new Terminal(symbol))) {
+            return Terminal.class;
+        } else if (nonterminals.contains(new Nonterminal(symbol))) {
+            return Nonterminal.class;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Add exact symbol to list.
+     *
+     * @param list   the list
+     * @param symbol the symbol
+     */
+    private void addExactSymbolToList(List<ProductionSymbol> list, String symbol) {
+        Set<Terminal> terminals = ControllerMediator.getInstance().getTerminalCopy();
+        Set<Nonterminal> nonterminals = ControllerMediator.getInstance().getNonterminalCopy();
+        if (terminals.contains(new Terminal(symbol))) {
+            list.add(new Terminal(symbol));
+        } else if (nonterminals.contains(new Nonterminal(symbol))) {
+            list.add(new Nonterminal(symbol));
+        } else {
+            throw new UnknownSymbolException(symbol);
+        }
+    }
+
+    /**
+     * 感觉效果不行，
+     * @return callback
+     */
+    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ProductionSymbol>>
+    rightSuggestionProvider() {
+        return request -> {
+            String input = request.getUserText();
+            logger.debug(input);
+            // TODO: 继续写
+            return null;
+        };
+    }
 
 }

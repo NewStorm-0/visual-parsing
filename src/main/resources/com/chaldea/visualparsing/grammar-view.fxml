@@ -15,7 +15,7 @@
     <children>
       <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="770.0" spacing="30.0" style="-fx-background-color: #D97FA7;">
          <children>
-              <Button fx:id="addExpressionButton" disable="true" mnemonicParsing="false" onAction="#addExpression" text="增加产生式" textAlignment="CENTER" />
+              <Button fx:id="addExpressionButton" disable="true" mnemonicParsing="false" onAction="#addExpressionHBox" text="增加产生式" textAlignment="CENTER" />
             <Label fx:id="startSymbolLabel" text="开始符号：">
                <font>
                   <Font name="System Bold" size="18.0" />
