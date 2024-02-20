@@ -161,8 +161,12 @@ public class ExpressionHBox extends HBox {
                 Nonterminal head = parseLeftTextField();
                 Expression body = parseRightTextField();
                 logger.debug(body.toString());
-                ControllerMediator.getInstance().getGrammarViewController()
-                        .addExpressionToGrammar(head, body);
+                if (!(head.equals(expressionHead) && body.equals(expressionBody))) {
+                    // 判断是否改变了文本输入框内容
+                    ControllerMediator.getInstance().getGrammarViewController()
+                            .addExpressionToGrammar(head, body);
+                }
+
                 // 保存成功
                 leftTextField.setEditable(false);
                 rightTextField.setEditable(false);

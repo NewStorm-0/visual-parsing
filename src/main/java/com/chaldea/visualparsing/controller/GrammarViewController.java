@@ -5,6 +5,9 @@ import com.chaldea.visualparsing.exception.grammar.RepeatedSymbolException;
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.gui.ExpressionHBox;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -55,7 +58,7 @@ public class GrammarViewController {
     protected Button terminalDeleteButton;
     @FXML
     protected Label startSymbolLabel;
-    private ObservableList<ExpressionHBox> expressionHBoxList;
+    private final ObservableList<ExpressionHBox> expressionHBoxList;
 
     @Deprecated
     public Grammar getGrammar() {
@@ -68,11 +71,12 @@ public class GrammarViewController {
      * 当前打开的语法文件
      */
     private File grammarFile;
-    private boolean unsaved = false;
+    private final BooleanProperty unsaved = new SimpleBooleanProperty(false);
 
     public GrammarViewController() {
         expressionHBoxList = FXCollections.observableArrayList();
         expressionHBoxList.addListener(this::expressionHBoxListListener);
+        unsaved.addListener(this::unsavedListener);
         ControllerMediator.getInstance().setGrammarViewController(this);
         logger.debug("已经注册GrammarViewController");
     }
@@ -118,7 +122,7 @@ public class GrammarViewController {
      */
     private void cleanupPreviousData() {
         // 检查是否有之前未保存的修改
-        if (unsaved) {
+        if (unsaved.get()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("未保存");
             alert.setHeaderText("保存已经进行的修改？");
@@ -126,10 +130,10 @@ public class GrammarViewController {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 saveGrammar();
-                unsaved = false;
+                unsaved.set(false);
                 logger.debug("OK了，家人们");
             } else if (result.isPresent()) {
-                unsaved = false;
+                unsaved.set(false);
                 logger.debug(result.get().getButtonData().toString());
             }
         }
@@ -158,6 +162,10 @@ public class GrammarViewController {
         Optional<String> startSymbolOptional =
                 DialogShower.showInputDialog("请输入开始符号", "非终结符：");
         if (startSymbolOptional.isEmpty()) {
+            return;
+        }
+        if (startSymbolOptional.get().isBlank()) {
+            DialogShower.showErrorDialog("不能为空白符号");
             return;
         }
         grammar = new Grammar(startSymbolOptional.get());
@@ -230,7 +238,7 @@ public class GrammarViewController {
      * <p>用户新建文件后，第一次保存要弹出对话框选择文件位置，后续就成为第三种情况</p>
      */
     public void saveGrammar() {
-        if (grammarFile == null && !unsaved && grammar == null) {
+        if (grammarFile == null && !unsaved.get() && grammar == null) {
             // 没有打开、新建、修改文法文件，则无需进行任何操作
             return;
         }
@@ -251,7 +259,7 @@ public class GrammarViewController {
             ControllerMediator.getInstance().setStageTitlePrefix(grammarFile.getName());
             // 若选择了文件，则一定符合下列判定
         }
-        if (grammarFile != null && unsaved) {
+        if (grammarFile != null && unsaved.get()) {
             if (grammar.isEmpty()) {
                 // 如果文法产生式个数为 0
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -263,7 +271,7 @@ public class GrammarViewController {
             // 打开文件并且进行了修改
             try {
                 GrammarReaderWriter.writeGrammarToFile(grammar, grammarFile);
-                unsaved = false;
+                unsaved.set(false);
                 DialogShower.showInformationDialog("保存到文件成功");
                 logger.debug("保存文法：{}", grammar);
             } catch (IOException e) {
@@ -307,12 +315,12 @@ public class GrammarViewController {
 
     public void addExpressionToGrammar(Nonterminal head, Expression body) {
         grammar.addExpression(head, body);
-        unsaved = true;
+        unsaved.set(true);
     }
 
     public void deleteExpressionFromGrammar(Nonterminal head, Expression body) {
         grammar.deleteExpression(head, body);
-        unsaved = true;
+        unsaved.set(true);
     }
 
     /**
@@ -447,7 +455,7 @@ public class GrammarViewController {
             for (ExpressionHBox expressionHBox : expressionHBoxList) {
                 expressionHBox.updateLeftAutoCompletionBinding();
             }
-            unsaved = true;
+            unsaved.set(true);
         }
     }
 
@@ -465,7 +473,7 @@ public class GrammarViewController {
             if (change.wasRemoved()) {
                 handleRemovedTerminals(change);
             }
-            unsaved = true;
+            unsaved.set(true);
         }
     }
 
@@ -559,6 +567,19 @@ public class GrammarViewController {
                     scrollVBox.getChildren().remove(expressionHBox);
                 }
             }
+        }
+    }
+
+    private void unsavedListener(ObservableValue<? extends Boolean> observable,
+                                 Boolean oldValue, Boolean newValue) {
+        String stageTitlePrefix = ControllerMediator.getInstance().getStageTitlePrefix();
+        if (oldValue && !newValue) {
+            // 由 true 变为 false
+            ControllerMediator.getInstance().setStageTitlePrefix(stageTitlePrefix
+                    .substring(0, stageTitlePrefix.length() - 1));
+        } else if (!oldValue && newValue) {
+            // 由 false 变为 true
+            ControllerMediator.getInstance().setStageTitlePrefix(stageTitlePrefix + "*");
         }
     }
 
