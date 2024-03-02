@@ -18,9 +18,9 @@
                   <MenuItem mnemonicParsing="false" onAction="#saveGrammar" text="保存" />
                </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="要">
+            <Menu fx:id="syntacticAnalysisMenu" disable="true" mnemonicParsing="false" text="语法分析">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Delete" />
+                  <MenuItem mnemonicParsing="false" text="LL(1)分析" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" onAction="#openUserManual" text="帮助">
@@ -35,7 +35,7 @@
              <Tab text="文法">
                  <fx:include source="grammar-view.fxml" />
              </Tab>
-            <Tab text="Untitled Tab 2" />
+            <Tab disable="true" text="语法分析" />
          </tabs>
       </TabPane>
    </children>

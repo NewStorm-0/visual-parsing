@@ -97,6 +97,13 @@ public class GrammarReaderWriter {
         }
     }
 
+    /**
+     * 对一个 {@link com.chaldea.visualparsing.grammar.Grammar} 对象进行序列化，并写入
+     * 到输出流
+     * @param grammar 文法对象
+     * @param outputStream 输出流
+     * @throws IOException IO错误
+     */
     public static void writeGrammarToStream(Grammar grammar, OutputStream outputStream) throws IOException {
         try (ObjectOutputStream output = new ObjectOutputStream(outputStream)) {
             output.writeObject(grammar);

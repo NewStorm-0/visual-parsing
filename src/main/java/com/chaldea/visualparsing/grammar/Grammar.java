@@ -121,6 +121,111 @@ public class Grammar implements Serializable {
     }
 
     /**
+     * Gets production symbol.
+     *
+     * @param value the symbol value
+     * @return the production symbol
+     */
+    public ProductionSymbol getProductionSymbol(String value) {
+        for (Nonterminal nonterminal : nonterminals) {
+            if (nonterminal.getValue().equals(value)) {
+                return nonterminal;
+            }
+        }
+        for (Terminal terminal : terminals) {
+            if (terminal.getValue().equals(value)) {
+                return terminal;
+            }
+        }
+        throw new UnknownSymbolException();
+    }
+
+    /**
+     * Generate expression.
+     *
+     * @param values the values
+     * @return the expression
+     */
+    public Expression generateExpression(String... values) {
+        List<ProductionSymbol> productionSymbols = new ArrayList<>(values.length);
+        for (String value : values) {
+            productionSymbols.add(getProductionSymbol(value));
+        }
+        return new Expression(productionSymbols.toArray(ProductionSymbol[]::new));
+    }
+
+    /**
+     * Convert string to expression.
+     * <p>对字符串进行解析，被<>括住的是一个文法符号，不被括住的，每一个字符视为一个文法符号</p>
+     *
+     * @param values the values
+     * @return the expression
+     */
+    public Expression convertStringToExpression(String values) {
+        List<String> stringList = new ArrayList<>();
+        for (int index = 0; index < values.length();) {
+            index = values.indexOf('<');
+            if (index == -1) {
+                break;
+            }
+            String singleSymbolString = values.substring(0, index);
+            String[] strings = new String[singleSymbolString.length()];
+            for (int i = 0; i < singleSymbolString.length(); i++) {
+                strings[i] = String.valueOf(singleSymbolString.charAt(i));
+            }
+            stringList.addAll(List.of(strings));
+            // 将 values 从上一次找到 < 的地方裁剪
+            values = values.substring(index + 1);
+            index = values.indexOf('>');
+            if (index == -1) {
+                throw new IllegalSymbolException("单独出现的 <");
+            }
+            stringList.add(values.substring(0, index));
+            // 将 values 从找到 > 的地方后一位开始裁剪
+            values = values.substring(index + 1);
+            index = 0;
+        }
+        if (!values.isEmpty()) {
+            String[] strings = new String[values.length()];
+            for (int i = 0; i < values.length(); i++) {
+                strings[i] = String.valueOf(values.charAt(i));
+            }
+            stringList.addAll(List.of(strings));
+        }
+        return generateExpression(stringList.toArray(String[]::new));
+    }
+
+    /**
+     * Gets nonterminal.
+     *
+     * @param value the value
+     * @return the nonterminal
+     */
+    public Nonterminal getNonterminal(String value) {
+        for (Nonterminal nonterminal : nonterminals) {
+            if (nonterminal.getValue().equals(value)) {
+                return nonterminal;
+            }
+        }
+        throw new UnknownSymbolException();
+    }
+
+    /**
+     * Gets terminal.
+     *
+     * @param value the value
+     * @return the terminal
+     */
+    public Terminal getTerminal(String value) {
+        for (Terminal terminal : terminals) {
+            if (terminal.getValue().equals(value)) {
+                return terminal;
+            }
+        }
+        throw new UnknownSymbolException();
+    }
+
+    /**
      * Sets start symbol.
      *
      * @param startSymbol the start symbol

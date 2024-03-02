@@ -324,7 +324,16 @@ public class GrammarViewController {
     }
 
     /**
-     * 增加表达式
+     * Has grammar file boolean.
+     * 检测打开文法后，是否成功打=开了选择的文法文件
+     * @return the boolean
+     */
+    public boolean hasGrammarFile() {
+        return grammarFile != null;
+    }
+
+    /**
+     * 增加表达式。向界面中增加一组表达式的相关组件。
      */
     @FXML
     protected void addExpressionHBox() {
@@ -334,6 +343,7 @@ public class GrammarViewController {
         }
         ExpressionHBox lastExpressionHBox = expressionHBoxList.get(expressionHBoxList.size() - 1);
         if (lastExpressionHBox != null && lastExpressionHBox.isEmpty()) {
+            // 上一个增加的表达式内容还没有填
             DialogShower.showWarningDialog("请在填写当前产生式后再添加新的表达式");
             new Thread(() -> {
                 lastExpressionHBox.toWarningState();

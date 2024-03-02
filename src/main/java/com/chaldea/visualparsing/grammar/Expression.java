@@ -1,5 +1,7 @@
 package com.chaldea.visualparsing.grammar;
 
+import com.chaldea.visualparsing.exception.BaseException;
+
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -22,6 +24,12 @@ public class Expression implements Serializable {
     }
 
     public void setValue(ProductionSymbol[] value) {
+        if (value == null) {
+            throw new BaseException("Expression.value 为空");
+        }
+        if (value.length == 0) {
+            throw new BaseException("Expression.value.length 为 0");
+        }
         this.value = value;
     }
 
@@ -32,6 +40,10 @@ public class Expression implements Serializable {
      */
     public ProductionSymbol get(int index) {
         return value[index];
+    }
+
+    public boolean isEmptyString() {
+        return value.length == 1 && value[0].equals(Terminal.EMPTY_STRING);
     }
 
     @Deprecated

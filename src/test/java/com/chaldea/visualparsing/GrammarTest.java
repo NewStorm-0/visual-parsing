@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 
 public class GrammarTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -55,13 +53,7 @@ public class GrammarTest {
 
     @Test
     void test0() {
-        try {
-            URL url = getClass().getResource("");
-            Path filePath =
-                    Path.of(url.toURI());
-            logger.info(String.valueOf(filePath.toAbsolutePath()));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        String a = "0123";
+        logger.info(a.substring(4));
     }
 }

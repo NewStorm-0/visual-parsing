@@ -5,10 +5,7 @@ import com.chaldea.visualparsing.Main;
 import com.chaldea.visualparsing.gui.DialogShower;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -24,6 +21,8 @@ public class MainFrameController {
     protected VBox topVBox;
     @FXML
     protected TabPane tabPane;
+    @FXML
+    protected Menu syntacticAnalysisMenu;
     private static final Logger logger = LoggerFactory.getLogger(MainFrameController.class);
 
     public MainFrameController() {
@@ -86,11 +85,23 @@ public class MainFrameController {
     @FXML
     protected void createGrammar() {
         ControllerMediator.getInstance().getGrammarViewController().createGrammar();
+        syntacticAnalysisMenu.setDisable(false);
+        syntacticAnalysisMenu.getItems().forEach(item -> {
+            item.setDisable(false);
+        });
     }
 
     @FXML
     protected void openGrammar() {
-        ControllerMediator.getInstance().getGrammarViewController().openGrammar();
+        GrammarViewController grammarViewController =
+                ControllerMediator.getInstance().getGrammarViewController();
+        grammarViewController.openGrammar();
+        if (grammarViewController.hasGrammarFile()) {
+            syntacticAnalysisMenu.setDisable(false);
+            syntacticAnalysisMenu.getItems().forEach(item -> {
+                item.setDisable(false);
+            });
+        }
     }
 
     @FXML
