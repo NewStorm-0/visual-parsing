@@ -41,6 +41,22 @@ public class LL1Parser {
     }
 
     /**
+     * Generate predictive parsing table.
+     *
+     * @return the predictive parsing table
+     */
+    public PredictiveParsingTable generatePredictiveParsingTable() {
+        PredictiveParsingTable parsingTable = new PredictiveParsingTable(grammar);
+        for (Production production : grammar.getProductions()) {
+            for (Expression expression : production.getBody()) {
+                addExpressionToPredictiveParsingTable(production.getHead(), expression,
+                        parsingTable);
+            }
+        }
+        return parsingTable;
+    }
+
+    /**
      * 获取文法符号symbol的FIRST(symbol)
      * <p>返回的值是一份拷贝，对其修改不会影响到symbolFirstMap</p>
      * @param symbol the symbol
@@ -163,4 +179,29 @@ public class LL1Parser {
         }
         return followSet;
     }
+
+    /**
+     * Add expression to predictive parsing table.
+     *
+     * @param head       the head
+     * @param expression the expression
+     * @param table      the table
+     */
+    private void addExpressionToPredictiveParsingTable(Nonterminal head,
+                                                       Expression expression,
+                                                       PredictiveParsingTable table) {
+        Set<Terminal> expressionFirstSet = first(expression);
+        if (expressionFirstSet.contains(Terminal.EMPTY_STRING)) {
+            Set<Terminal> headFollowSet = follow(head);
+            for (Terminal inputSymbol : headFollowSet) {
+                table.set(head, inputSymbol, expression);
+            }
+            // 注意，空集不能算输入符号
+            expressionFirstSet.remove(Terminal.EMPTY_STRING);
+        }
+        for (Terminal inputSymbol : expressionFirstSet) {
+            table.set(head, inputSymbol, expression);
+        }
+    }
+
 }

@@ -418,6 +418,12 @@ public class Grammar implements Serializable {
      */
     private boolean checkExpressionSymbols(Expression expression) {
         for (ProductionSymbol symbol : expression.getValue()) {
+            if (symbol.equals(Terminal.EMPTY_STRING)) {
+                return true;
+            }
+            if (symbol.equals(Terminal.END_MARKER)) {
+                return false;
+            }
             if (symbol instanceof Terminal && !terminals.contains((Terminal) symbol)) {
                 return false;
             } else if (symbol instanceof Nonterminal

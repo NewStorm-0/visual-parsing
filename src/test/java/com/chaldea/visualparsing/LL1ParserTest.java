@@ -2,12 +2,14 @@ package com.chaldea.visualparsing;
 
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.parsing.LL1Parser;
+import com.chaldea.visualparsing.parsing.PredictiveParsingTable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +26,7 @@ public class LL1ParserTest {
     public static void setGrammar() {
         grammar = new Grammar("E");
         Terminal[] terminals = new Terminal[] {
-                Terminal.EMPTY_STRING, new Terminal("+"),
+                new Terminal("+"),
                 new Terminal("*"), new Terminal("("),
                 new Terminal(")"), new Terminal("id")
         };
@@ -125,5 +127,13 @@ public class LL1ParserTest {
         fFollow.add(grammar.getTerminal(")"));
         fFollow.add(Terminal.END_MARKER);
         assertEquals(fFollow, ll1Parser.follow(grammar.getNonterminal("F")));
+    }
+
+    @Test
+    void testGeneratePredictiveParsingTable() {
+        PredictiveParsingTable table = ll1Parser.generatePredictiveParsingTable();
+        logger.info("row map:\n{}", table.getNonterminalMap());
+        logger.info("col map:\n{}", table.getInputSymbolMap());
+        logger.info("table:\n{}", table.toFormattedTableString());
     }
 }

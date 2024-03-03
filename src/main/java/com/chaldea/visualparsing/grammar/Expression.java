@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * 表达式，是产生式体中的一条
  */
-public class Expression implements Serializable {
+public class Expression implements Serializable, Cloneable {
     private ProductionSymbol[] value;
 
     public Expression() {
@@ -46,6 +46,14 @@ public class Expression implements Serializable {
         return value.length == 1 && value[0].equals(Terminal.EMPTY_STRING);
     }
 
+    public Expression copy() {
+        try {
+            return (Expression) clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Deprecated
     public boolean isEmpty() {
         // TODO: 如何处理表达式体为空
@@ -65,9 +73,21 @@ public class Expression implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Arrays.hashCode(value);
+    }
+
+    @Override
     public String toString() {
         return "Expression{" +
                 "value=" + Arrays.toString(value) +
                 '}';
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Expression expression = (Expression) super.clone();
+        expression.setValue(value.clone());
+        return expression;
     }
 }

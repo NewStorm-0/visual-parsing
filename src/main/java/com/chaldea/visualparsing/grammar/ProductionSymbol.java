@@ -9,7 +9,7 @@ import java.util.Objects;
  * 用于表示产生式{@link com.chaldea.visualparsing.grammar.Production}中的{@code body}
  */
 public abstract class ProductionSymbol implements Serializable {
-    private String value;
+    private final String value;
 
     public ProductionSymbol(String value) {
         this.value = value;
