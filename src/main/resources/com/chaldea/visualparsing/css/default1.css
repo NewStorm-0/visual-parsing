@@ -3,15 +3,30 @@
 }
 
 .tab-pane {
-    -fx-background-color: #b4fbd0;
+    -fx-background-color: #c7edcc;
 }
 
 .scroll-pane {
-    -fx-background-color: #b4fbd0;
+    -fx-background-color: #c7edcc;
 }
 
 .warning {
     -fx-border-color: #d13e3e;
     -fx-border-width: 0.8pt;
     -fx-border-radius: 2pt;
+}
+
+.table-view {
+    -fx-font-size: 14pt;
+    -fx-alignment: CENTER;
+}
+
+.table-column {
+    -fx-alignment: CENTER;
+}
+
+.table-column {
+    -fx-border-color: grey; /* 设置分割线的颜色 */
+    -fx-border-width: 0.5pt; /* 设置分割线的宽度 */
+    -fx-border-style: solid; /* 设置分割线的样式 */
 }

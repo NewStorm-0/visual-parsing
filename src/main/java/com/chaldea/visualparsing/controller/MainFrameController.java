@@ -2,6 +2,7 @@ package com.chaldea.visualparsing.controller;
 
 import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.Main;
+import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.gui.DialogShower;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +24,8 @@ public class MainFrameController {
     protected TabPane tabPane;
     @FXML
     protected Menu syntacticAnalysisMenu;
+    @FXML
+    protected Tab ll1Tab;
     private static final Logger logger = LoggerFactory.getLogger(MainFrameController.class);
 
     public MainFrameController() {
@@ -107,5 +110,16 @@ public class MainFrameController {
     @FXML
     protected void saveGrammar() {
         ControllerMediator.getInstance().getGrammarViewController().saveGrammar();
+        Grammar grammar = ControllerMediator.getInstance().getGrammar();
+        if (grammar != null && !grammar.isEmpty()) {
+            ControllerMediator.getInstance().getLl1ViewController().loadGrammar();
+        }
+    }
+
+    @FXML
+    protected void openLL1Tab() {
+        ll1Tab.setDisable(false);
+        ControllerMediator.getInstance().getLl1ViewController().loadGrammar();
+        tabPane.getSelectionModel().select(ll1Tab);
     }
 }

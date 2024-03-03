@@ -60,7 +60,6 @@ public class GrammarViewController {
     protected Label startSymbolLabel;
     private final ObservableList<ExpressionHBox> expressionHBoxList;
 
-    @Deprecated
     public Grammar getGrammar() {
         return grammar;
     }

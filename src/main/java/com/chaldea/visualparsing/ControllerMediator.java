@@ -1,6 +1,7 @@
 package com.chaldea.visualparsing;
 
 import com.chaldea.visualparsing.controller.GrammarViewController;
+import com.chaldea.visualparsing.controller.LL1ViewController;
 import com.chaldea.visualparsing.controller.MainFrameController;
 import com.chaldea.visualparsing.controller.UserManualController;
 import com.chaldea.visualparsing.grammar.Grammar;
@@ -18,6 +19,7 @@ public class ControllerMediator {
     private GrammarViewController grammarViewController;
     private UserManualController userManualController;
     private MainFrameController mainFrameController;
+    private LL1ViewController ll1ViewController;
 
     public GrammarViewController getGrammarViewController() {
         return grammarViewController;
@@ -41,6 +43,14 @@ public class ControllerMediator {
 
     public void setMainFrameController(MainFrameController mainFrameController) {
         this.mainFrameController = mainFrameController;
+    }
+
+    public LL1ViewController getLl1ViewController() {
+        return ll1ViewController;
+    }
+
+    public void setLl1ViewController(LL1ViewController ll1ViewController) {
+        this.ll1ViewController = ll1ViewController;
     }
 
     /**
@@ -73,7 +83,6 @@ public class ControllerMediator {
      *
      * @return the grammar
      */
-    @Deprecated
     public Grammar getGrammar() {
         return grammarViewController.getGrammar();
     }
