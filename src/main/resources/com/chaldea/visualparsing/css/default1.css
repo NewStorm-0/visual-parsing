@@ -30,3 +30,19 @@
     -fx-border-width: 0.5pt; /* 设置分割线的宽度 */
     -fx-border-style: solid; /* 设置分割线的样式 */
 }
+
+.check-box .box {
+    -fx-background-color: #b0e643; /* 设置背景颜色 */
+    -fx-shape: "M10,5 A5,5 0 1 1 10,15 A5,5 0 1 1 10,5";
+    -fx-border-width: 1pt;
+    -fx-border-style: solid;
+}
+
+.algorithm-vbox {
+    -fx-font-size: 16px;
+    -fx-border-style: solid;
+}
+
+.next-statement {
+    -fx-background-color: #e05959;
+}
