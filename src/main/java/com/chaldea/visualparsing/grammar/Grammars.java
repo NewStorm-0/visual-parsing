@@ -38,6 +38,14 @@ public class Grammars {
     private static void eliminateLeftRecursionRunner(Grammar grammar) {
         Nonterminal[] nonterminals =
                 grammar.getNonterminals().toArray(Nonterminal[]::new);
+        // 将文法的开始符号放在第一位
+        for (int i = 0; i < nonterminals.length; i++) {
+            if (grammar.getStartSymbol().equals(nonterminals[i])) {
+                nonterminals[i] = nonterminals[0];
+                nonterminals[0] = grammar.getStartSymbol();
+                break;
+            }
+        }
         for (int i = 0; i < nonterminals.length; i++) {
             Grammar backupGrammar = (Grammar) grammar.clone();
             for (int j = 0; j <= i - 1; j++) {
