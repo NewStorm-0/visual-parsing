@@ -6,15 +6,12 @@ import com.chaldea.visualparsing.exception.grammar.RepeatedSymbolException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 文法
  */
-public class Grammar implements Serializable {
+public class Grammar implements Serializable, Cloneable {
     /**
      * 产生式集合
      * <p>当产生式的数量很大时，可以将 {@code List<Production>} 改为
@@ -49,9 +46,9 @@ public class Grammar implements Serializable {
      * @param start the start
      */
     public Grammar(Nonterminal start) {
-        productions = new ArrayList<>(8);
-        nonterminals = new HashSet<>(8);
-        terminals = new HashSet<>(8);
+        productions = new ArrayList<>();
+        nonterminals = new HashSet<>();
+        terminals = new HashSet<>();
         nonterminals.add(start);
         startSymbol = start;
     }
@@ -409,6 +406,60 @@ public class Grammar implements Serializable {
                 ", terminals=" + terminals +
                 ", startSymbol=" + startSymbol +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Grammar grammar = (Grammar) o;
+        return Objects.equals(getProductions(), grammar.getProductions()) && Objects.equals(getNonterminals(), grammar.getNonterminals()) && Objects.equals(getTerminals(), grammar.getTerminals()) && Objects.equals(getStartSymbol(), grammar.getStartSymbol());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getProductions(), getNonterminals(), getTerminals(), getStartSymbol());
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            Grammar clone = (Grammar) super.clone();
+            clone.terminals = new HashSet<>(this.terminals);
+            clone.nonterminals = new HashSet<>(this.nonterminals);
+            clone.startSymbol = this.startSymbol;
+            clone.productions = new ArrayList<>();
+            for (Production production : this.productions) {
+                Production cloneProduction = new Production(production.getHead());
+                for (Expression expression : production.getBody()) {
+                    cloneProduction.addExpression(expression.copy());
+                }
+                clone.productions.add(cloneProduction);
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getProductionsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Production production : productions) {
+            stringBuilder.append(production.getHead().getValue()).append("→");
+            for (Expression expression : production.getBody()) {
+                for (ProductionSymbol symbol : expression.getValue()) {
+                    stringBuilder.append(symbol.getValue()).append(" ");
+                }
+                stringBuilder.append("| ");
+            }
+            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
     }
 
     /**
