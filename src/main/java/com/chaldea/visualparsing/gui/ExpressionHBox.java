@@ -1,6 +1,6 @@
 package com.chaldea.visualparsing.gui;
 
-import com.chaldea.visualparsing.ControllerMediator;
+import com.chaldea.visualparsing.controller.ControllerMediator;
 import com.chaldea.visualparsing.exception.grammar.IllegalSymbolException;
 import com.chaldea.visualparsing.exception.grammar.RepeatedProductionException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
@@ -68,9 +68,11 @@ public class ExpressionHBox extends HBox {
         leftTextField.setEditable(false);
         leftTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
         leftTextField.setPromptText("输入产生式头(非终结符)");
+        leftTextField.getStyleClass().add("production-text-field");
         rightTextField.setEditable(false);
         rightTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
         rightTextField.setPromptText("输入产生式体");
+        rightTextField.getStyleClass().add("production-text-field");
 
         Label rightArrow = new Label("➡");
         rightArrow.setScaleX(2.0);
@@ -78,7 +80,9 @@ public class ExpressionHBox extends HBox {
         rightArrow.setTextFill(Paint.valueOf("lawngreen"));
         rightArrow.setFont(new Font("System Bold", 20.0));
         editButton.setOnAction(this::editOrSave);
+        editButton.getStyleClass().add("production-button");
         deleteButton.setOnAction(this::delete);
+        deleteButton.getStyleClass().add("production-button");
         this.getChildren().addAll(leftTextField, rightArrow, rightTextField, editButton, deleteButton);
     }
 

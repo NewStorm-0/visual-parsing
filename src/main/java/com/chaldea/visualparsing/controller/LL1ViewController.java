@@ -1,9 +1,7 @@
 package com.chaldea.visualparsing.controller;
 
-import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.debug.PredictiveAnalyticsObserver;
 import com.chaldea.visualparsing.debug.StepwiseAlgorithmDebugger;
-import com.chaldea.visualparsing.exception.BaseException;
 import com.chaldea.visualparsing.exception.NullPredictivParsingCellException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
 import com.chaldea.visualparsing.grammar.*;
@@ -12,7 +10,6 @@ import com.chaldea.visualparsing.gui.PredictiveParsingStepData;
 import com.chaldea.visualparsing.parsing.LL1Parser;
 import com.chaldea.visualparsing.debug.PredictiveAnalyticsAlgorithm;
 import com.chaldea.visualparsing.parsing.PredictiveParsingTable;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

@@ -1,6 +1,6 @@
 package com.chaldea.visualparsing.controller;
 
-import com.chaldea.visualparsing.ControllerMediator;
+import com.chaldea.visualparsing.exception.grammar.IllegalSymbolException;
 import com.chaldea.visualparsing.exception.grammar.RepeatedSymbolException;
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.gui.DialogShower;
@@ -16,10 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -225,6 +222,9 @@ public class GrammarViewController {
         } catch (StreamCorruptedException e) {
             grammarFile = null;
             DialogShower.showErrorDialog("读取文法错误", "获取文法失败！");
+        } catch (InvalidClassException e) {
+            grammarFile = null;
+            DialogShower.showErrorDialog("文法文件版本与本程序版本不兼容");
         } catch (IOException e) {
             grammarFile = null;
             DialogShower.showExceptionDialog(e);
@@ -269,6 +269,10 @@ public class GrammarViewController {
             }
             // 打开文件并且进行了修改
             try {
+                // 提取文法左公因子
+                Grammars.extractingLeftCommonFactors(grammar);
+                // 消除文法左递归
+                Grammars.eliminateLeftRecursion(grammar);
                 GrammarReaderWriter.writeGrammarToFile(grammar, grammarFile);
                 unsaved.set(false);
                 DialogShower.showInformationDialog("保存到文件成功");
@@ -325,6 +329,7 @@ public class GrammarViewController {
     /**
      * Has grammar file boolean.
      * 检测打开文法后，是否成功打=开了选择的文法文件
+     *
      * @return the boolean
      */
     public boolean hasGrammarFile() {
@@ -525,7 +530,7 @@ public class GrammarViewController {
         for (Nonterminal n : addedNonterminals) {
             try {
                 grammar.addNonterminal(n);
-            } catch (RepeatedSymbolException e) {
+            } catch (RepeatedSymbolException | IllegalSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
         }
@@ -546,7 +551,7 @@ public class GrammarViewController {
         for (Terminal t : addedTerminals) {
             try {
                 grammar.addTerminal(t);
-            } catch (RepeatedSymbolException e) {
+            } catch (RepeatedSymbolException | IllegalSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
         }
@@ -560,6 +565,7 @@ public class GrammarViewController {
 
     /**
      * expressionHBoxList 监听器，向 scrollVBox 中动态增减 expressionHBox
+     *
      * @param change the change
      */
     private void expressionHBoxListListener(

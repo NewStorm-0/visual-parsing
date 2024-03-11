@@ -1,6 +1,5 @@
 package com.chaldea.visualparsing.controller;
 
-import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.gui.DialogShower;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
