@@ -46,3 +46,7 @@
 .next-statement {
     -fx-background-color: #e05959;
 }
+
+.production-text-field .production-button {
+    -fx-font-size: 20px;
+}

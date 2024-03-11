@@ -1,6 +1,5 @@
 package com.chaldea.visualparsing.controller;
 
-import com.chaldea.visualparsing.ControllerMediator;
 import com.chaldea.visualparsing.Main;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.gui.DialogShower;

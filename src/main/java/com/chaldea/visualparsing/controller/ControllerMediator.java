@@ -1,9 +1,5 @@
-package com.chaldea.visualparsing;
+package com.chaldea.visualparsing.controller;
 
-import com.chaldea.visualparsing.controller.GrammarViewController;
-import com.chaldea.visualparsing.controller.LL1ViewController;
-import com.chaldea.visualparsing.controller.MainFrameController;
-import com.chaldea.visualparsing.controller.UserManualController;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;

@@ -30,26 +30,50 @@
                       <VBox fx:id="scrollVBox" prefHeight="325.0" prefWidth="305.0" spacing="10.0">
                           <children>
                               <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0" style="-fx-background-color: pink;">
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="1234567890987654321234567890" />
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="1234567890987654321234567890">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></TextField>
                                   <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
                                       <font>
                                           <Font name="System Bold" size="20.0" />
                                       </font>
                                   </Label>
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="81.0" text="ADC" />
-                                  <Button mnemonicParsing="false" text="编辑" />
-                                  <Button mnemonicParsing="false" text="删除" />
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="81.0" text="ADC">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></TextField>
+                                  <Button mnemonicParsing="false" text="编辑">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></Button>
+                                  <Button mnemonicParsing="false" text="删除">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></Button>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="E" />
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="E">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></TextField>
                                   <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
                                       <font>
                                           <Font name="System Bold" size="20.0" />
                                       </font>
                                   </Label>
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="82.0" text="ADC" />
-                                  <Button mnemonicParsing="false" text="编辑" />
-                                  <Button mnemonicParsing="false" text="删除" />
+                                  <TextField editable="false" prefHeight="29.0" prefWidth="82.0" text="ADC">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></TextField>
+                                  <Button mnemonicParsing="false" text="编辑">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></Button>
+                                  <Button mnemonicParsing="false" text="删除">
+                              <font>
+                                 <Font size="20.0" />
+                              </font></Button>
                               </HBox>
                           </children>
                           <padding>
@@ -73,7 +97,7 @@
                               <Font name="System Bold" size="24.0" />
                            </font>
                         </Label>
-                        <ListView fx:id="nonterminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: silver;" />
+                        <ListView fx:id="nonterminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: silver; -fx-font-size: 20px;" />
                         <HBox alignment="CENTER" prefHeight="50.0" prefWidth="191.0" spacing="20.0">
                            <children>
                               <Button fx:id="nonterminalNewButton" disable="true" mnemonicParsing="false" onAction="#newNonterminal" text="新增" />
@@ -89,7 +113,7 @@
                               <Font name="System Bold" size="24.0" />
                            </font>
                         </Label>
-                        <ListView fx:id="terminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: grey;" />
+                        <ListView fx:id="terminalListView" prefHeight="250.0" prefWidth="210.0" style="-fx-background-color: grey; -fx-font-size: 20px;" />
                         <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="20.0">
                            <children>
                               <Button fx:id="terminalNewButton" disable="true" mnemonicParsing="false" onAction="#newTerminal" text="新增" />

@@ -122,6 +122,7 @@ public class Grammar implements Serializable, Cloneable {
      *
      * @param value the symbol value
      * @return the production symbol
+     * @throws UnknownSymbolException 不包含该value的文法符号
      */
     public ProductionSymbol getProductionSymbol(String value) {
         for (Nonterminal nonterminal : nonterminals) {
@@ -134,11 +135,12 @@ public class Grammar implements Serializable, Cloneable {
                 return terminal;
             }
         }
-        throw new UnknownSymbolException();
+        throw new UnknownSymbolException("不包含value为" + value + "的文法符号");
     }
 
     /**
      * Generate expression.
+     * <p>每个symbol的value是一个String对象</p>
      *
      * @param values the values
      * @return the expression
@@ -239,6 +241,7 @@ public class Grammar implements Serializable, Cloneable {
      *
      * @param symbol the symbol
      * @throws RepeatedSymbolException 抛出异常
+     * @throws IllegalSymbolException 添加代表空串的符号时出现的异常
      */
     public void addTerminal(Terminal symbol) {
         if (terminals.contains(symbol)) {
@@ -246,6 +249,12 @@ public class Grammar implements Serializable, Cloneable {
         }
         if (nonterminals.contains(new Nonterminal(symbol.getValue()))) {
             throw new RepeatedSymbolException("非终结符集合中已经包含该符号");
+        }
+        if (Terminal.EMPTY_STRING.equals(symbol)) {
+            throw new IllegalSymbolException("不可添加空串" + Terminal.EMPTY_STRING.getValue());
+        }
+        if (Terminal.END_MARKER.equals(symbol)) {
+            throw new IllegalSymbolException("不可添加结束标记" + Terminal.END_MARKER.getValue());
         }
         terminals.add(symbol);
     }
@@ -274,6 +283,7 @@ public class Grammar implements Serializable, Cloneable {
      *
      * @param symbol the symbol
      * @throws RepeatedSymbolException 抛出异常
+     * @throws IllegalSymbolException 符号值不符合要求
      */
     public void addNonterminal(Nonterminal symbol) {
         if (terminals.contains(new Terminal(symbol.getValue()))) {
@@ -281,6 +291,12 @@ public class Grammar implements Serializable, Cloneable {
         }
         if (nonterminals.contains(new Nonterminal(symbol.getValue()))) {
             throw new RepeatedSymbolException("已经包含该非终结符");
+        }
+        if (Terminal.EMPTY_STRING.getValue().equals(symbol.getValue())) {
+            throw new IllegalSymbolException("值不能同空串符号" + Terminal.EMPTY_STRING.getValue() + "相同");
+        }
+        if (Terminal.END_MARKER.getValue().equals(symbol.getValue())) {
+            throw new IllegalSymbolException("值不能同结束标记" + Terminal.END_MARKER.getValue() + "相同");
         }
         nonterminals.add(symbol);
     }
@@ -324,7 +340,7 @@ public class Grammar implements Serializable, Cloneable {
      * @throws UnknownSymbolException 产生式头部不在非终结符定义中
      * @throws IllegalSymbolException 表达式中含有非法符号
      */
-    public void addExpression(Nonterminal head, Expression exp) throws EmptyHeadProductionException {
+    public void addExpression(Nonterminal head, Expression exp) {
         if (head == null) {
             throw new EmptyHeadProductionException();
         }
@@ -343,6 +359,17 @@ public class Grammar implements Serializable, Cloneable {
         Production p = new Production(head);
         p.addExpression(exp);
         productions.add(p);
+    }
+
+    /**
+     * Add expression.
+     *
+     * @param headValue the head value
+     * @param exp       the exp
+     */
+    public void addExpression(String headValue, Expression exp) {
+        Nonterminal head = getNonterminal(headValue);
+        addExpression(head, exp);
     }
 
     /**
