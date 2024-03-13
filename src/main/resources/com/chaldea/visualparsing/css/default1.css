@@ -47,6 +47,6 @@
     -fx-background-color: #e05959;
 }
 
-.production-text-field .production-button {
+.production-text-field, .production-button {
     -fx-font-size: 20px;
 }

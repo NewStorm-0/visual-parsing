@@ -154,7 +154,9 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
         String styleClass = "next-statement";
         algorithmVBox.getChildren().forEach(node ->
                 node.getStyleClass().remove(styleClass));
-        if (index == -1 || index >= stepView.getColumns().size()) {
+        int algorithmSize = (int) algorithmVBox.getChildren().stream()
+                .filter(node -> node instanceof CheckBox).count();
+        if (index == -1 || index >= algorithmSize) {
             return;
         }
         algorithmVBox.getChildren().get(index + 2).getStyleClass().add(styleClass);

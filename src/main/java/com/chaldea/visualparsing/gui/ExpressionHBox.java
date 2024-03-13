@@ -66,11 +66,11 @@ public class ExpressionHBox extends HBox {
 //                rightSuggestionProvider());
 
         leftTextField.setEditable(false);
-        leftTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide(3));
+        leftTextField.prefWidthProperty().bind(widthProperty().subtract(220).divide(3));
         leftTextField.setPromptText("输入产生式头(非终结符)");
         leftTextField.getStyleClass().add("production-text-field");
         rightTextField.setEditable(false);
-        rightTextField.prefWidthProperty().bind(widthProperty().subtract(180).divide((double) 3 / 2));
+        rightTextField.prefWidthProperty().bind(widthProperty().subtract(220).divide((double) 3 / 2));
         rightTextField.setPromptText("输入产生式体");
         rightTextField.getStyleClass().add("production-text-field");
 

@@ -84,6 +84,15 @@ public class LL1ParserTest {
     }
 
     @Test
+    void saveGrammarToFile() {
+        try {
+            GrammarReaderWriter.writeGrammarToFile(grammar, new File("./example.gra"));
+        } catch (IOException e) {
+            logger.error(e.toString());
+        }
+    }
+
+    @Test
     void testFirst() {
         logger.info(ll1Parser.getGrammar().getProductions().toString());
         Set<Terminal> fFirst = new HashSet<>();
