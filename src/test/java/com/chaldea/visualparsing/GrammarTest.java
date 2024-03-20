@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class GrammarTest {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(GrammarTest.class);
 
     @Test
     void testExpression() {

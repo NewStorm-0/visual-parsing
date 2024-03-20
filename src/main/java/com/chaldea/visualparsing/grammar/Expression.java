@@ -30,7 +30,7 @@ public class Expression implements Serializable, Cloneable {
         return value;
     }
 
-    public void setValue(ProductionSymbol[] value) {
+    private void setValue(ProductionSymbol[] value) {
         if (value == null) {
             throw new BaseException("Expression.value 为空");
         }
@@ -59,6 +59,15 @@ public class Expression implements Serializable, Cloneable {
 
     public boolean isEmptyString() {
         return value.length == 1 && value[0].equals(Terminal.EMPTY_STRING);
+    }
+
+    /**
+     * Length int.返回符号的数目
+     *
+     * @return the int
+     */
+    public int length() {
+        return value.length;
     }
 
     public Expression copy() {

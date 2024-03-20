@@ -118,7 +118,7 @@ public class Grammar implements Serializable, Cloneable {
     }
 
     /**
-     * Gets production symbol.
+     * Gets production symbol.获取ProductionSymbol对象
      *
      * @param value the symbol value
      * @return the production symbol

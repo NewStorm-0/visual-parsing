@@ -18,7 +18,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LL1ParserTest {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(LL1ParserTest.class);
 
     private static Grammar grammar;
 

@@ -218,13 +218,25 @@ public class Grammars {
      * @param iterable the iterable
      * @return the production by head
      */
-    private static Production getProductionByHead(Nonterminal head, Iterable<Production> iterable) {
+    public static Production getProductionByHead(Nonterminal head,
+                                            Iterable<Production> iterable) {
         for (Production production : iterable) {
             if (production.getHead().equals(head)) {
                 return production;
             }
         }
         throw new ProductionNotFoundException("不存在head为" + head.getValue() + "的Production");
+    }
+
+    /**
+     * Gets production by head.
+     *
+     * @param head    the head
+     * @param grammar the grammar
+     * @return the production by head
+     */
+    public static Production getProductionByHead(Nonterminal head, Grammar grammar) {
+        return getProductionByHead(head, grammar.getProductions());
     }
 
     /**
@@ -378,7 +390,7 @@ public class Grammars {
      * @param initialSymbol the initial symbol
      * @return the auxiliary nonterminal
      */
-    private static Nonterminal getAuxiliaryNonterminal(Grammar grammar,
+    public static Nonterminal getAuxiliaryNonterminal(Grammar grammar,
                                                        Nonterminal initialSymbol) {
         String symbolValue = initialSymbol.getValue() + "'";
         try {
