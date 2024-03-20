@@ -77,6 +77,38 @@ public class CanonicalLR0Collection {
     }
 
     /**
+     * Closure item set.计算一个项的闭包
+     *
+     * @param item the item
+     * @return the item set
+     */
+    private ItemSet closure(Item item) {
+        ItemSet itemSet = new ItemSet();
+        itemSet.addItem(item);
+        return closure(itemSet);
+    }
+
+    /**
+     * GOTO(I,X)，返回I中所有形如[A→α·Xβ]的项[A→αX·β]的集合的闭包
+     *
+     * @param itemSet the item set.一个项集
+     * @param symbol  the symbol.一个文法符号
+     * @return the item set
+     */
+    private ItemSet go(ItemSet itemSet, ProductionSymbol symbol) {
+        ItemSet goItemSet = new ItemSet();
+        for (Item item : itemSet) {
+            if (!item.getCurrentSymbol().equals(symbol)) {
+                continue;
+            }
+            Item newItem = new Item(item.getHead(), item.getExpression(),
+                    item.getPoint() + 1);
+            goItemSet.addAllItems(closure(newItem));
+        }
+        return goItemSet;
+    }
+
+    /**
      * Add new items to closure item set.
      *
      * @param item            the item which is based on
