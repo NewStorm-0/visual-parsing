@@ -87,4 +87,20 @@ public class Item {
     public int hashCode() {
         return Objects.hash(getHead(), getExpression(), getPoint());
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(head.getValue()).append("→");
+        for (int i = 0; i < expression.length(); i++) {
+            if (i == point) {
+                stringBuilder.append("·");
+            }
+            stringBuilder.append(expression.get(i).getValue());
+        }
+        if (point == expression.length()) {
+            stringBuilder.append("·");
+        }
+        return stringBuilder.toString();
+    }
 }

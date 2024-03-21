@@ -425,6 +425,18 @@ public class Grammar implements Serializable, Cloneable {
         }
     }
 
+    /**
+     * Gets production symbols.返回所有的文法符号
+     *
+     * @return the production symbols
+     */
+    public Set<ProductionSymbol> getProductionSymbols() {
+        Set<ProductionSymbol> productionSymbolSet = new HashSet<>();
+        productionSymbolSet.addAll(getNonterminals());
+        productionSymbolSet.addAll(getTerminals());
+        return productionSymbolSet;
+    }
+
     @Override
     public String toString() {
         return "Grammar{" +

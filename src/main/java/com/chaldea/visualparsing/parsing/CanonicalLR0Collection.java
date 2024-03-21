@@ -4,9 +4,7 @@ import com.chaldea.visualparsing.grammar.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The type Canonical lr 0 collection.规范LR(0)项集族
@@ -31,6 +29,7 @@ public class CanonicalLR0Collection {
         originalGrammar = grammar;
         itemSetList = new ArrayList<>();
         setAugmentedGrammar();
+        setItemSetList();
     }
 
     /**
@@ -49,6 +48,45 @@ public class CanonicalLR0Collection {
         // 加上产生式S'→S
         augmentedGrammar.addExpression(newStartSymbol,
                 new Expression(new ProductionSymbol[]{oldStartSymbol}));
+    }
+
+    /**
+     * Sets item set list.计算增广文法的规范LR(0)项族
+     */
+    private void setItemSetList() {
+        ItemSet firstItemSet = closure(new Item(
+                augmentedGrammar.getStartSymbol(),
+                augmentedGrammar
+                        .generateExpression(originalGrammar.getStartSymbol().toString()),
+                0)
+        );
+        itemSetList.add(firstItemSet);
+        List<ItemSet> addedItemSet = new ArrayList<>();
+        addedItemSet.add(firstItemSet);
+        while (!addedItemSet.isEmpty()) {
+            List<ItemSet> addedItemSetCopy = new ArrayList<>(addedItemSet);
+            addedItemSet.clear();
+            for (ItemSet itemSet : addedItemSetCopy) {
+                addGoForItem(itemSet, addedItemSet);
+            }
+        }
+    }
+
+    /**
+     * Add go for item.
+     *
+     * @param itemSet      the item set
+     * @param addedItemSet the added item set
+     */
+    private void addGoForItem(ItemSet itemSet, List<ItemSet> addedItemSet) {
+        for (ProductionSymbol symbol : augmentedGrammar.getProductionSymbols()) {
+            ItemSet goItemSet = go(itemSet, symbol);
+            if (goItemSet.isEmpty() || itemSetList.contains(goItemSet)) {
+                continue;
+            }
+            itemSetList.add(goItemSet);
+            addedItemSet.add(goItemSet);
+        }
     }
 
     /**
@@ -98,7 +136,7 @@ public class CanonicalLR0Collection {
     private ItemSet go(ItemSet itemSet, ProductionSymbol symbol) {
         ItemSet goItemSet = new ItemSet();
         for (Item item : itemSet) {
-            if (!item.getCurrentSymbol().equals(symbol)) {
+            if (!symbol.equals(item.getCurrentSymbol())) {
                 continue;
             }
             Item newItem = new Item(item.getHead(), item.getExpression(),
@@ -136,4 +174,14 @@ public class CanonicalLR0Collection {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < itemSetList.size(); i++) {
+            stringBuilder.append("I").append(i).append(": ");
+            stringBuilder.append(itemSetList.get(i));
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
 }

@@ -109,4 +109,14 @@ public class ItemSet implements Iterable<Item> {
     public Iterator<Item> iterator() {
         return items.iterator();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Item item : items) {
+            stringBuilder.append(item).append(" ");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        return stringBuilder.toString();
+    }
 }
