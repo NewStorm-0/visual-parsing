@@ -121,4 +121,13 @@ public class MainFrameController {
         ControllerMediator.getInstance().getLl1ViewController().loadGrammar();
         tabPane.getSelectionModel().select(ll1Tab);
     }
+
+    @FXML
+    protected void setSLRTab() {
+        openLRTab();
+    }
+
+    private void openLRTab() {
+
+    }
 }

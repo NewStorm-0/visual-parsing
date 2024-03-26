@@ -23,7 +23,7 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
     private final List<Terminal> inputSymbols;
     private final Deque<ProductionSymbol> stack;
 
-    private List<PredictiveAnalyticsObserver> observers;
+    private final List<PredictiveAnalyticsObserver> observers;
 
     /**
      * 当前正在处理的符号的索引

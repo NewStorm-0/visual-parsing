@@ -42,6 +42,55 @@ public class Grammars {
     }
 
     /**
+     * Gets expression index.获取文法expression的索引
+     *
+     * @param grammar    the grammar
+     * @param head       the head
+     * @param expression the expression
+     * @return the expression index
+     */
+    public static int getExpressionIndex(Grammar grammar, Nonterminal head,
+                                         Expression expression) {
+        int index = 0;
+        for (Production production : grammar.getProductions()) {
+            if (!production.getHead().equals(head)) {
+                index += production.getBody().size();
+                continue;
+            }
+            int expressionIndex = production.getBody().indexOf(expression);
+            if (expressionIndex < 0) {
+                throw new ProductionNotFoundException("找不到" + head.getValue() + "→" + expression);
+            }
+            index += expressionIndex;
+            return index;
+        }
+        throw new ProductionNotFoundException(head.getValue() + "→" + expression);
+    }
+
+    /**
+     * Gets expression.获取文法指定索引的expression，为了包含head，
+     * 所以返回的是Production对象
+     *
+     * @param grammar the grammar
+     * @param index   the index
+     * @return the expression
+     */
+    public static Production getExpression(Grammar grammar, int index) {
+        int originalIndex = index;
+        for (Production production : grammar.getProductions()) {
+            int productionSize = production.getBody().size();
+            if (productionSize <= index) {
+                index -= productionSize;
+                continue;
+            }
+            List<Expression> expressions = new ArrayList<>(1);
+            expressions.add(production.getBody().get(index));
+            return new Production(production.getHead(), expressions);
+        }
+        throw new ProductionNotFoundException("未找到索引为" + originalIndex + "的表达式");
+    }
+
+    /**
      * Extracting left common factors .提取左公因子
      * <p>改方法被方法extractingLeftCommonFactors重复调用</p>
      *
@@ -219,7 +268,7 @@ public class Grammars {
      * @return the production by head
      */
     public static Production getProductionByHead(Nonterminal head,
-                                            Iterable<Production> iterable) {
+                                                 Iterable<Production> iterable) {
         for (Production production : iterable) {
             if (production.getHead().equals(head)) {
                 return production;
@@ -286,8 +335,8 @@ public class Grammars {
         longestCommonPrefix.add(maxSymbol);
         List<Expression> prefixedExpressions = expressions.stream().filter(
                 expression -> expression.getValue().length > index
-                                && expression.getValue()[index].equals(maxSymbol)
-                ).toList();
+                        && expression.getValue()[index].equals(maxSymbol)
+        ).toList();
         longestCommonPrefix.addAll(getLongestCommonPrefixRunner(prefixedExpressions,
                 index + 1, maxNumber));
         return longestCommonPrefix;
@@ -370,7 +419,7 @@ public class Grammars {
      * @return the boolean
      */
     private static boolean isArrayStartsWithList(ProductionSymbol[] symbols,
-                                            List<ProductionSymbol> symbolList) {
+                                                 List<ProductionSymbol> symbolList) {
         if (symbols.length < symbolList.size()) {
             return false;
         }
@@ -391,7 +440,7 @@ public class Grammars {
      * @return the auxiliary nonterminal
      */
     public static Nonterminal getAuxiliaryNonterminal(Grammar grammar,
-                                                       Nonterminal initialSymbol) {
+                                                      Nonterminal initialSymbol) {
         String symbolValue = initialSymbol.getValue() + "'";
         try {
             while (true) {

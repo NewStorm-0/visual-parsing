@@ -9,27 +9,75 @@ import java.util.*;
 /**
  * The type Canonical lr 0 collection.规范LR(0)项集族
  */
-public class CanonicalLR0Collection {
+public class CanonicalLR0Collection extends LRCollection {
     /**
      * The Augmented grammar.增广文法
      */
     private Grammar augmentedGrammar;
 
-    /**
-     * The Original grammar.原先的文法
-     */
-    private final Grammar originalGrammar;
-
-    private final List<ItemSet> itemSetList;
-
     private static final Logger logger =
             LoggerFactory.getLogger(CanonicalLR0Collection.class);
 
     public CanonicalLR0Collection(Grammar grammar) {
-        originalGrammar = grammar;
-        itemSetList = new ArrayList<>();
+        super(grammar);
         setAugmentedGrammar();
         setItemSetList();
+    }
+
+    public List<ItemSet> getItemSetList() {
+        return itemSetList;
+    }
+
+    public Grammar getAugmentedGrammar() {
+        return augmentedGrammar;
+    }
+
+    public Grammar getOriginalGrammar() {
+        return grammar;
+    }
+
+    /**
+     * Gets item set number.
+     *
+     * @param itemSet the item set
+     * @return the item set number
+     */
+    public int getItemSetNumber(ItemSet itemSet) {
+        return itemSetList.indexOf(itemSet);
+    }
+
+    /**
+     * Gets go item set.
+     *
+     * @param itemSet the item set
+     * @param symbol  the symbol
+     * @return the go item set
+     */
+    public ItemSet getGoItemSet(ItemSet itemSet, ProductionSymbol symbol) {
+        ItemSet goItemSet = go(itemSet, symbol);
+        return itemSetList.get(getItemSetNumber(goItemSet));
+    }
+
+    /**
+     * Gets go item set number.
+     *
+     * @param itemSet the item set
+     * @param symbol  the symbol
+     * @return the go item set number
+     */
+    public int getGoItemSetNumber(ItemSet itemSet, ProductionSymbol symbol) {
+        return getItemSetNumber(go(itemSet, symbol));
+    }
+
+    /**
+     * Gets closure item set.
+     *
+     * @param itemSet the item set
+     * @return the closure item set
+     */
+    public ItemSet getClosureItemSet(ItemSet itemSet) {
+        ItemSet closureItemSet = closure(itemSet);
+        return itemSetList.get(getItemSetNumber(closureItemSet));
     }
 
     /**
@@ -38,9 +86,9 @@ public class CanonicalLR0Collection {
      * 产生式S'→S而得到的文法</p>
      */
     private void setAugmentedGrammar() {
-        augmentedGrammar = (Grammar) originalGrammar.clone();
+        augmentedGrammar = (Grammar) grammar.clone();
         // 加上新开始符号S'
-        Nonterminal oldStartSymbol = originalGrammar.getStartSymbol();
+        Nonterminal oldStartSymbol = grammar.getStartSymbol();
         Nonterminal newStartSymbol = Grammars.getAuxiliaryNonterminal(augmentedGrammar,
                 augmentedGrammar.getStartSymbol());
         augmentedGrammar.addNonterminal(newStartSymbol);
@@ -57,7 +105,7 @@ public class CanonicalLR0Collection {
         ItemSet firstItemSet = closure(new Item(
                 augmentedGrammar.getStartSymbol(),
                 augmentedGrammar
-                        .generateExpression(originalGrammar.getStartSymbol().toString()),
+                        .generateExpression(grammar.getStartSymbol().toString()),
                 0)
         );
         itemSetList.add(firstItemSet);
@@ -152,7 +200,6 @@ public class CanonicalLR0Collection {
      * @param item            the item which is based on
      * @param closureSet      the closure set
      * @param newAddedItemSet the new added item set
-     * @return the item set
      */
     private void addItemsBasedOnItem(Item item, ItemSet closureSet,
                                      ItemSet newAddedItemSet) {
@@ -174,14 +221,4 @@ public class CanonicalLR0Collection {
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < itemSetList.size(); i++) {
-            stringBuilder.append("I").append(i).append(": ");
-            stringBuilder.append(itemSetList.get(i));
-            stringBuilder.append("\n");
-        }
-        return stringBuilder.toString();
-    }
 }
