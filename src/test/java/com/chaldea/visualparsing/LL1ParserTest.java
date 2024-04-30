@@ -76,6 +76,7 @@ public class LL1ParserTest {
         grammar.addExpression(new Nonterminal("F"), new Expression(new ProductionSymbol[]{
                 new Terminal("id")
         }));
+        generateGrammarFile();
     }
 
     @BeforeEach
@@ -146,5 +147,13 @@ public class LL1ParserTest {
         logger.info("row map:\n{}", table.getNonterminalMap());
         logger.info("col map:\n{}", table.getInputSymbolMap());
         logger.info("table:\n{}", table.toFormattedTableString());
+    }
+
+    private static void generateGrammarFile() {
+        try {
+            GrammarReaderWriter.writeGrammarToFile(grammar, new File("./ll1.gra"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

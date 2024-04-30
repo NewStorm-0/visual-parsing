@@ -16,18 +16,19 @@ import java.util.List;
  * <p>其中的每一步算法对应着龙书第二版P160最上面的伪代码</p>
  */
 public class LRParsingAlgorithm extends StepwiseAlgorithm {
-    private final LRParsingTable lrParsingTable;
+    private LRParsingTable lrParsingTable;
     private final Deque<Integer> stateStack;
     private final Deque<ProductionSymbol> symbolStack;
-    private final List<Terminal> inputSymbols;
+    private List<Terminal> inputSymbols;
     private int state;
     private ProductionSymbol symbol;
     private int symbolIndex;
 
-    public LRParsingAlgorithm(LRParsingTable lrParsingTable, List<Terminal> input) {
-        this.lrParsingTable = lrParsingTable;
-        this.inputSymbols = input;
-        input.add(Terminal.END_MARKER);
+    /**
+     * Instantiates a new Lr parsing algorithm.
+     * 需要在后续设置lrParsingTable和input
+     */
+    public LRParsingAlgorithm() {
         algorithmStepList = new ArrayList<>();
         stateStack = new LinkedList<>();
         symbolStack = new LinkedList<>();
@@ -39,6 +40,21 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         algorithmStepList.add(pushGoOntoStackAndOutputProduction());
         algorithmStepList.add(elseIfAccept());
         algorithmStepList.add(elseErrorRecovery());
+    }
+
+    public LRParsingAlgorithm(LRParsingTable lrParsingTable, List<Terminal> input) {
+        this();
+        setLrParsingTable(lrParsingTable);
+        setInputSymbols(input);
+    }
+
+    public void setLrParsingTable(LRParsingTable lrParsingTable) {
+        this.lrParsingTable = lrParsingTable;
+    }
+
+    public void setInputSymbols(List<Terminal> inputSymbols) {
+        this.inputSymbols = inputSymbols;
+        this.inputSymbols.add(Terminal.END_MARKER);
     }
 
     @Override
@@ -60,7 +76,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     }
 
     /**
-     * Let s is ths state of top algorithm step. 令x是栈顶的状态
+     * Let s is ths state of top algorithm step. 令s是栈顶的状态
      *
      * @return the algorithm step
      */

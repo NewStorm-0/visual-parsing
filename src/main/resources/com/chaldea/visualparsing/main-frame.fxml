@@ -40,10 +40,8 @@
             <Tab fx:id="ll1Tab" disable="true" text="LL(1)语法分析">
                   <fx:include source="ll1-view.fxml" />
             </Tab>
-            <Tab disable="true" text="LR语法分析">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
+            <Tab fx:id="lrTab" disable="true" text="LR语法分析">
+                  <fx:include source="lr-view.fxml" />
             </Tab>
          </tabs>
       </TabPane>

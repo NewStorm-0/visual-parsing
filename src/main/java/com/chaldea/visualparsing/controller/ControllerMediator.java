@@ -16,6 +16,7 @@ public class ControllerMediator {
     private UserManualController userManualController;
     private MainFrameController mainFrameController;
     private LL1ViewController ll1ViewController;
+    private LRViewController lrViewController;
 
     public GrammarViewController getGrammarViewController() {
         return grammarViewController;
@@ -72,6 +73,24 @@ public class ControllerMediator {
      */
     public String getStageTitlePrefix() {
         return mainFrameController.getStageTitlePrefix();
+    }
+
+    /**
+     * Gets lr view controller.
+     *
+     * @return the lr view controller
+     */
+    public LRViewController getLrViewController() {
+        return lrViewController;
+    }
+
+    /**
+     * Sets lr view controller.
+     *
+     * @param lrViewController the lr view controller
+     */
+    public void setLrViewController(LRViewController lrViewController) {
+        this.lrViewController = lrViewController;
     }
 
     /**

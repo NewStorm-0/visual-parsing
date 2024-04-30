@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox fx:id="rootHBox" prefHeight="485.0" prefWidth="600.0" stylesheets="@css/default1.css"
+       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
+   <children>
+      <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.6149553571428572" prefHeight="400.0"
+                  prefWidth="600.0">
+        <items>
+            <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5494966442953021" orientation="VERTICAL"
+                        prefHeight="200.0" prefWidth="160.0">
+              <items>
+                <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="333.0"
+                             prefWidth="364.0">
+                     <children>
+                        <Label fx:id="grammarTypeLabel" layoutX="14.0" layoutY="1.0" prefHeight="29.0"
+                                prefWidth="56.0" text="SLR">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="72.0" text="语法分析表">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <TableView fx:id="tableView" layoutX="13.0" layoutY="31.0" prefHeight="200.0" prefWidth="340.0">
+                          <columns>
+                            <TableColumn fx:id="stateColumn" prefWidth="75.0" text="状态" />
+                            <TableColumn fx:id="actionColumn" prefWidth="169.3333511352539" text="ACTION" />
+                              <TableColumn fx:id="gotoColumn" prefWidth="75.0" text="GOTO" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0" style="-fx-background-color: #F1CE91;" />
+              </items>
+            </SplitPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #D26BC6;" />
+        </items>
+      </SplitPane>
+   </children>
+</HBox>

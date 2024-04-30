@@ -3,6 +3,7 @@ package com.chaldea.visualparsing.controller;
 import com.chaldea.visualparsing.Main;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.gui.DialogShower;
+import com.chaldea.visualparsing.parsing.LRParsingTable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -18,13 +19,15 @@ public class MainFrameController {
     public static String TITLE_SUFFIX = "——可视化分析器";
 
     @FXML
-    protected VBox topVBox;
+    private VBox topVBox;
     @FXML
-    protected TabPane tabPane;
+    private TabPane tabPane;
     @FXML
-    protected Menu syntacticAnalysisMenu;
+    private Menu syntacticAnalysisMenu;
     @FXML
-    protected Tab ll1Tab;
+    private Tab ll1Tab;
+    @FXML
+    private Tab lrTab;
     private static final Logger logger = LoggerFactory.getLogger(MainFrameController.class);
 
     public MainFrameController() {
@@ -69,7 +72,7 @@ public class MainFrameController {
      * 打开用户手册对话框
      */
     @FXML
-    protected void openUserManual() {
+    private void openUserManual() {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("使用说明");
         ButtonType buttonType = new ButtonType("好的", ButtonBar.ButtonData.OK_DONE);
@@ -85,7 +88,7 @@ public class MainFrameController {
     }
 
     @FXML
-    protected void createGrammar() {
+    private void createGrammar() {
         ControllerMediator.getInstance().getGrammarViewController().createGrammar();
         syntacticAnalysisMenu.setDisable(false);
         syntacticAnalysisMenu.getItems().forEach(item -> {
@@ -94,7 +97,7 @@ public class MainFrameController {
     }
 
     @FXML
-    protected void openGrammar() {
+    private void openGrammar() {
         GrammarViewController grammarViewController =
                 ControllerMediator.getInstance().getGrammarViewController();
         grammarViewController.openGrammar();
@@ -107,7 +110,7 @@ public class MainFrameController {
     }
 
     @FXML
-    protected void saveGrammar() {
+    private void saveGrammar() {
         ControllerMediator.getInstance().getGrammarViewController().saveGrammar();
         Grammar grammar = ControllerMediator.getInstance().getGrammar();
         if (grammar != null && !grammar.isEmpty()) {
@@ -116,18 +119,21 @@ public class MainFrameController {
     }
 
     @FXML
-    protected void openLL1Tab() {
+    private void openLL1Tab() {
         ll1Tab.setDisable(false);
         ControllerMediator.getInstance().getLl1ViewController().loadGrammar();
         tabPane.getSelectionModel().select(ll1Tab);
     }
 
     @FXML
-    protected void setSLRTab() {
+    private void setSLRTab() {
+        ControllerMediator.getInstance().getLrViewController()
+                .setLRType(LRParsingTable.Type.SLR);
         openLRTab();
     }
 
     private void openLRTab() {
-
+        lrTab.setDisable(false);
+        tabPane.getSelectionModel().select(lrTab);
     }
 }

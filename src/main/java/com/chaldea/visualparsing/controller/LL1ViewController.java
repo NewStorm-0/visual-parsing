@@ -10,6 +10,7 @@ import com.chaldea.visualparsing.gui.PredictiveParsingStepData;
 import com.chaldea.visualparsing.parsing.LL1Parser;
 import com.chaldea.visualparsing.debug.PredictiveAnalyticsAlgorithm;
 import com.chaldea.visualparsing.parsing.PredictiveParsingTable;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -79,7 +80,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
     private LL1Parser ll1Parser;
     private PredictiveParsingTable parsingTable;
 
-    private StepwiseAlgorithmDebugger algorithmDebugger;
+    private final StepwiseAlgorithmDebugger algorithmDebugger;
     /**
      * The Table column list.存放预测分析表中输入符号的列
      */
@@ -126,8 +127,6 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
         addInputSymbolColumns();
         // 添加子列
         inputSymbolColumn.getColumns().setAll(tableColumnList);
-        // 表格添加列
-        tableView.getColumns().setAll(nonterminalColumn, inputSymbolColumn);
         // 添加数据
         Set<Pair<Nonterminal, Expression[]>> tableData = new HashSet<>();
         for (Map.Entry<Nonterminal, Integer> entry : parsingTable.getNonterminalMap().entrySet()) {
@@ -265,7 +264,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
     }
 
     /**
-     * Bind check box.为checkbox绑定事件
+     * Bind check box.为checkbox（断点）绑定事件
      */
     private void bindCheckBox() {
         judgeStackNotNullPoint.setOnAction(event -> {

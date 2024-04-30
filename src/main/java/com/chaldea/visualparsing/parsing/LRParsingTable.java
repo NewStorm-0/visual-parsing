@@ -13,4 +13,15 @@ public abstract class LRParsingTable {
     public abstract ActionItem action(int state, Terminal terminal);
 
     public abstract int go(int state, Nonterminal nonterminal);
+
+    public abstract Terminal[] getActionColumnsHeader();
+
+    public abstract Nonterminal[] getGotoColumnsHeader();
+
+    /**
+     * The enum Type. 具体的LR类型
+     */
+    public enum Type {
+        SLR, LR0, LR1, LALR;
+    }
 }

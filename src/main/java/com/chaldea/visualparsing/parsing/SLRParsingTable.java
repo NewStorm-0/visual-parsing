@@ -44,6 +44,17 @@ public class SLRParsingTable extends LRParsingTable {
         return 0;
     }
 
+    @Override
+    public Terminal[] getActionColumnsHeader() {
+        return terminalsOrder.clone();
+    }
+
+    @Override
+    public Nonterminal[] getGotoColumnsHeader() {
+        return nonterminalsOrder.clone();
+    }
+
+
     /**
      * Construct action table.构建ACTION表
      */
@@ -122,7 +133,7 @@ public class SLRParsingTable extends LRParsingTable {
 
     private void initProductionSymbolsOrder(Grammar grammar) {
         terminalsOrder = new Terminal[grammar.getTerminals().size() + 1];
-        nonterminalsOrder = new Nonterminal[grammar.getTerminals().size()];
+        nonterminalsOrder = new Nonterminal[grammar.getNonterminals().size()];
         int index = 0;
         for (Terminal terminal : grammar.getTerminals()) {
             terminalsOrder[index] = terminal;
@@ -132,6 +143,7 @@ public class SLRParsingTable extends LRParsingTable {
         index = 0;
         for (Nonterminal nonterminal : grammar.getNonterminals()) {
             nonterminalsOrder[index] = nonterminal;
+            index += 1;
         }
     }
 
@@ -143,12 +155,22 @@ public class SLRParsingTable extends LRParsingTable {
      */
     private int getSymbolNumber(ProductionSymbol symbol) {
         if (symbol instanceof Nonterminal) {
-            return Arrays.binarySearch(nonterminalsOrder, symbol);
+            return findIndex(nonterminalsOrder, symbol);
         } else if (symbol instanceof Terminal) {
-            return Arrays.binarySearch(terminalsOrder, symbol);
+            return findIndex(terminalsOrder, symbol);
         } else {
             throw new UnknownSymbolException();
         }
+    }
+
+    private static <T> int findIndex(T[] array, T target) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(target)) {
+                return i;
+            }
+        }
+        // 如果元素不在数组中，则返回-1
+        return -1;
     }
 
 }
