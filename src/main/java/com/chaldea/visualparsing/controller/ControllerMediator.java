@@ -51,7 +51,7 @@ public class ControllerMediator {
     }
 
     /**
-     * 获取当前 Scene
+     * 获取当前主窗口的 Scene
      * @return Scene
      */
     public Scene getScene() {
@@ -59,7 +59,7 @@ public class ControllerMediator {
     }
 
     /**
-     * 修改窗口标题前缀
+     * 修改主窗口标题前缀
      * @param titlePrefix 标题前缀
      */
     public void setStageTitlePrefix(String titlePrefix) {

@@ -28,33 +28,33 @@ import org.slf4j.LoggerFactory;
  */
 public class GrammarViewController {
     @FXML
-    protected VBox topVBox;
+    private VBox topVBox;
     @FXML
-    protected VBox scrollVBox;
+    private VBox scrollVBox;
     @FXML
-    protected SplitPane splitPane;
+    private SplitPane splitPane;
     @FXML
-    protected ScrollPane grammarScrollPane;
+    private ScrollPane grammarScrollPane;
     @FXML
-    protected Button addExpressionButton;
+    private Button addExpressionButton;
     @FXML
-    protected ListView<Nonterminal> nonterminalListView;
+    private ListView<Nonterminal> nonterminalListView;
     @FXML
-    protected ListView<Terminal> terminalListView;
+    private ListView<Terminal> terminalListView;
     @FXML
-    protected VBox nonterminalVBox;
+    private VBox nonterminalVBox;
     @FXML
     private VBox terminalVBox;
     @FXML
-    protected Button nonterminalNewButton;
+    private Button nonterminalNewButton;
     @FXML
-    protected Button nonterminalDeleteButton;
+    private Button nonterminalDeleteButton;
     @FXML
-    protected Button terminalNewButton;
+    private Button terminalNewButton;
     @FXML
-    protected Button terminalDeleteButton;
+    private Button terminalDeleteButton;
     @FXML
-    protected Label startSymbolLabel;
+    private Label startSymbolLabel;
     private final ObservableList<ExpressionHBox> expressionHBoxList;
 
     public Grammar getGrammar() {

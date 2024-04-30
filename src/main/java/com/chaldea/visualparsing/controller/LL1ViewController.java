@@ -28,53 +28,53 @@ import java.util.regex.Pattern;
 public class LL1ViewController implements PredictiveAnalyticsObserver {
 
     @FXML
-    protected HBox topHBox;
+    private HBox topHBox;
     @FXML
-    protected AnchorPane leftAnchorPane;
+    private AnchorPane leftAnchorPane;
     @FXML
-    protected AnchorPane rightAnchorPane;
+    private AnchorPane rightAnchorPane;
     @FXML
-    protected ScrollPane tableScrollPane;
+    private ScrollPane tableScrollPane;
     @FXML
-    protected TableView<Pair<Nonterminal, Expression[]>> tableView;
+    private TableView<Pair<Nonterminal, Expression[]>> tableView;
     @FXML
-    protected TableColumn<Pair<Nonterminal, Expression[]>, String> nonterminalColumn;
+    private TableColumn<Pair<Nonterminal, Expression[]>, String> nonterminalColumn;
     @FXML
-    protected TableColumn<Pair<Nonterminal, Expression[]>, String> inputSymbolColumn;
+    private TableColumn<Pair<Nonterminal, Expression[]>, String> inputSymbolColumn;
     @FXML
-    protected TextField inputStringTextField;
+    private TextField inputStringTextField;
     @FXML
-    protected VBox algorithmVBox;
+    private VBox algorithmVBox;
     @FXML
-    protected ScrollPane stepScrollPane;
+    private ScrollPane stepScrollPane;
     @FXML
-    protected TableView<PredictiveParsingStepData> stepView;
+    private TableView<PredictiveParsingStepData> stepView;
     @FXML
-    protected TableColumn<PredictiveParsingStepData, String> numberColumn;
+    private TableColumn<PredictiveParsingStepData, String> numberColumn;
     @FXML
-    protected TableColumn<PredictiveParsingStepData, String> stackColumn;
+    private TableColumn<PredictiveParsingStepData, String> stackColumn;
     @FXML
-    protected TableColumn<PredictiveParsingStepData, String> inputColumn;
+    private TableColumn<PredictiveParsingStepData, String> inputColumn;
     @FXML
-    protected TableColumn<PredictiveParsingStepData, String> actionColumn;
+    private TableColumn<PredictiveParsingStepData, String> actionColumn;
     @FXML
-    protected TableColumn<PredictiveParsingStepData, String> expressionColumn;
+    private TableColumn<PredictiveParsingStepData, String> expressionColumn;
     @FXML
-    protected CheckBox judgeStackNotNullPoint;
+    private CheckBox judgeStackNotNullPoint;
     @FXML
-    protected CheckBox ifXEqualsIpSymbolPoint;
+    private CheckBox ifXEqualsIpSymbolPoint;
     @FXML
-    protected CheckBox elseIfXIsTerminalPoint;
+    private CheckBox elseIfXIsTerminalPoint;
     @FXML
-    protected CheckBox elseIfMIsAWrongItemPoint;
+    private CheckBox elseIfMIsAWrongItemPoint;
     @FXML
-    protected CheckBox finalElse;
+    private CheckBox finalElse;
     @FXML
-    protected CheckBox letXEqualsTopOfTheStack;
+    private CheckBox letXEqualsTopOfTheStack;
     @FXML
-    protected Button resumeButton;
+    private Button resumeButton;
     @FXML
-    protected Button stepButton;
+    private Button stepButton;
 
     private Grammar grammar;
     private LL1Parser ll1Parser;

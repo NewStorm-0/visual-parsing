@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public class UserManualController {
     @FXML
-    protected Text text;
+    private Text text;
     private static final Logger logger =
             LoggerFactory.getLogger(UserManualController.class);
 
