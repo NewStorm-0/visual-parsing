@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -8,20 +9,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="rootHBox" prefHeight="485.0" prefWidth="600.0" stylesheets="@css/default1.css"
-       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
+<HBox fx:id="rootHBox" prefHeight="485.0" prefWidth="600.0" stylesheets="@css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
    <children>
-      <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.6149553571428572" prefHeight="400.0"
-                  prefWidth="600.0">
+      <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.6149553571428572" prefHeight="400.0" prefWidth="600.0">
         <items>
-            <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5494966442953021" orientation="VERTICAL"
-                        prefHeight="200.0" prefWidth="160.0">
+            <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5494966442953021" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="333.0"
-                             prefWidth="364.0">
+                <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="333.0" prefWidth="364.0">
                      <children>
-                        <Label fx:id="grammarTypeLabel" layoutX="14.0" layoutY="1.0" prefHeight="29.0"
-                                prefWidth="56.0" text="SLR">
+                        <Label fx:id="grammarTypeLabel" layoutX="14.0" layoutY="1.0" prefHeight="29.0" prefWidth="56.0" text="SLR">
                            <font>
                               <Font name="System Bold" size="22.0" />
                            </font>
@@ -38,6 +34,11 @@
                               <TableColumn fx:id="gotoColumn" prefWidth="75.0" text="GOTO" />
                           </columns>
                         </TableView>
+                        <Button layoutX="196.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="92.0" text="查看项集族">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Button>
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0" style="-fx-background-color: #F1CE91;" />

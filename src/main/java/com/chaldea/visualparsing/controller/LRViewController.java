@@ -69,7 +69,7 @@ public class LRViewController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         setStateColumnCellFactory();
         setLayout();
     }
@@ -77,7 +77,7 @@ public class LRViewController {
     /**
      * Sets grammar. 设置相应文法及具体LR文法处理技术
      */
-    public void setLRType(LRParsingTable.Type parsingTableType) {
+    void setLRType(LRParsingTable.Type parsingTableType) {
         grammar = ControllerMediator.getInstance().getGrammar();
         LRParsingAlgorithm lrParsingAlgorithm =
                 (LRParsingAlgorithm) algorithmDebugger.getStepwiseAlgorithm();

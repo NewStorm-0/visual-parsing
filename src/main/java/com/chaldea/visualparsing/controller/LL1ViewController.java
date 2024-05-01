@@ -95,7 +95,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         setColumnsCellValueFactory();
         bindCheckBox();
         leftAnchorPane.prefWidthProperty().bind(topHBox.widthProperty().multiply(0.5));
@@ -118,7 +118,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
     /**
      * Load grammar. 加载文法
      */
-    public void loadGrammar() {
+    void loadGrammar() {
         grammar = ControllerMediator.getInstance().getGrammar();
         ll1Parser = new LL1Parser(grammar);
         parsingTable = ll1Parser.generatePredictiveParsingTable();
@@ -181,7 +181,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
      * Process input string.
      */
     @FXML
-    protected void processInputString() {
+    private void processInputString() {
         if (inputStringTextField.getText().isBlank()) {
             DialogShower.showErrorDialog("输入不能为空");
             return;
@@ -207,7 +207,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
      * Resume debugger.
      */
     @FXML
-    protected void resumeDebugger() {
+    private void resumeDebugger() {
         algorithmDebugger.resume();
     }
 
@@ -215,7 +215,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
      * Step debugger.
      */
     @FXML
-    protected void stepDebugger() {
+    private void stepDebugger() {
         algorithmDebugger.step();
     }
 

@@ -57,10 +57,6 @@ public class GrammarViewController {
     private Label startSymbolLabel;
     private final ObservableList<ExpressionHBox> expressionHBoxList;
 
-    public Grammar getGrammar() {
-        return grammar;
-    }
-
     private Grammar grammar;
     private static final Logger logger = LoggerFactory.getLogger(GrammarViewController.class);
     /**
@@ -77,8 +73,12 @@ public class GrammarViewController {
         logger.debug("已经注册GrammarViewController");
     }
 
+    Grammar getGrammar() {
+        return grammar;
+    }
+
     @FXML
-    public void initialize() {
+    private void initialize() {
         nonterminalListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Nonterminal nonterminal, boolean empty) {
@@ -153,7 +153,7 @@ public class GrammarViewController {
     /**
      * 新建一个文法
      */
-    public void createGrammar() {
+    void createGrammar() {
         cleanupPreviousData();
         Optional<String> startSymbolOptional =
                 DialogShower.showInputDialog("请输入开始符号", "非终结符：");
@@ -179,7 +179,7 @@ public class GrammarViewController {
     /**
      * 选择一个文件，并从该文件中读出一个文法
      */
-    public void openGrammar() {
+    void openGrammar() {
         cleanupPreviousData();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("打开文法文件");
@@ -236,7 +236,7 @@ public class GrammarViewController {
      * 保存当前文法到文件中
      * <p>用户新建文件后，第一次保存要弹出对话框选择文件位置，后续就成为第三种情况</p>
      */
-    public void saveGrammar() {
+    void saveGrammar() {
         if (grammarFile == null && !unsaved.get() && grammar == null) {
             // 没有打开、新建、修改文法文件，则无需进行任何操作
             return;
@@ -294,7 +294,7 @@ public class GrammarViewController {
      *
      * @return the nonterminal copy
      */
-    public Set<Nonterminal> getNonterminalCopy() {
+    Set<Nonterminal> getNonterminalCopy() {
         return new HashSet<>(grammar.getNonterminals());
     }
 
@@ -303,7 +303,7 @@ public class GrammarViewController {
      *
      * @return the terminal copy
      */
-    public Set<Terminal> getTerminalCopy() {
+    Set<Terminal> getTerminalCopy() {
         return new HashSet<>(grammar.getTerminals());
     }
 
@@ -332,7 +332,7 @@ public class GrammarViewController {
      *
      * @return the boolean
      */
-    public boolean hasGrammarFile() {
+    boolean hasGrammarFile() {
         return grammarFile != null;
     }
 
@@ -340,7 +340,7 @@ public class GrammarViewController {
      * 增加表达式。向界面中增加一组表达式的相关组件。
      */
     @FXML
-    protected void addExpressionHBox() {
+    private void addExpressionHBox() {
         if (expressionHBoxList.isEmpty()) {
             expressionHBoxList.add(new ExpressionHBox());
             return;
@@ -368,7 +368,7 @@ public class GrammarViewController {
      * 新增非终结符
      */
     @FXML
-    protected void newNonterminal() {
+    private void newNonterminal() {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setTitle("提示");
         inputDialog.setHeaderText("请输入一个非终结符");
@@ -390,7 +390,7 @@ public class GrammarViewController {
      * 删除非终结符
      */
     @FXML
-    protected void deleteNonterminal() {
+    private void deleteNonterminal() {
         Nonterminal removedNonterminal =
                 nonterminalListView.getSelectionModel().getSelectedItem();
         nonterminalListView.getItems().remove(removedNonterminal);
@@ -401,7 +401,7 @@ public class GrammarViewController {
      * 新增终结符
      */
     @FXML
-    protected void newTerminal() {
+    private void newTerminal() {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setTitle("提示");
         inputDialog.setHeaderText("请输入一个终结符");
@@ -423,7 +423,7 @@ public class GrammarViewController {
      * 删除终结符
      */
     @FXML
-    protected void deleteTerminal() {
+    private void deleteTerminal() {
         Terminal removedTerminal = terminalListView.getSelectionModel().getSelectedItem();
         terminalListView.getItems().remove(removedTerminal);
         logger.debug("Grammar Terminals: {}", grammar.getTerminals());

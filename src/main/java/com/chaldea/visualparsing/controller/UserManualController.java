@@ -21,7 +21,7 @@ public class UserManualController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         readFromManual();
     }
 

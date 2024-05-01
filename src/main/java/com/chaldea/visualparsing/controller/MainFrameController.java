@@ -36,7 +36,7 @@ public class MainFrameController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         Screen screen = Screen.getPrimary();
         double topVBoxWidth = screen.getVisualBounds().getWidth() - 60;
         double topVBoxHeight = screen.getVisualBounds().getHeight() - 120;
@@ -45,7 +45,7 @@ public class MainFrameController {
         tabPane.prefHeightProperty().bind(topVBox.heightProperty().subtract(35));
     }
 
-    public VBox getTopVBox() {
+    VBox getTopVBox() {
         return topVBox;
     }
 
@@ -53,7 +53,7 @@ public class MainFrameController {
      * 修改窗口标题前缀
      * @param titlePrefix 标题前缀
      */
-    public void setStageTitlePrefix(String titlePrefix) {
+    void setStageTitlePrefix(String titlePrefix) {
         ((Stage) topVBox.getScene().getWindow()).setTitle(titlePrefix + TITLE_SUFFIX);
     }
 
@@ -62,7 +62,7 @@ public class MainFrameController {
      *
      * @return the stage title prefix
      */
-    public String getStageTitlePrefix() {
+    String getStageTitlePrefix() {
         Stage stage = ((Stage) topVBox.getScene().getWindow());
         int index = stage.getTitle().indexOf(TITLE_SUFFIX);
         return stage.getTitle().substring(0, index);
