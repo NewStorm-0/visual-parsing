@@ -105,6 +105,10 @@ public class LRViewController {
         setTableViewDate();
     }
 
+    @FXML
+    private void showLrCollection() {
+        DialogShower.showInformationDialog(lrParsingTable.getLrCollection().toString());
+    }
 
     /**
      * Sets state column cell factory.

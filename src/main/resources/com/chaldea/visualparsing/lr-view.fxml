@@ -34,7 +34,8 @@
                               <TableColumn fx:id="gotoColumn" prefWidth="75.0" text="GOTO" />
                           </columns>
                         </TableView>
-                        <Button layoutX="196.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="92.0" text="查看项集族">
+                        <Button onAction="#showLrCollection" layoutX="196.0" mnemonicParsing="false"
+                                 prefHeight="29.0" prefWidth="92.0" text="查看项集族">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
