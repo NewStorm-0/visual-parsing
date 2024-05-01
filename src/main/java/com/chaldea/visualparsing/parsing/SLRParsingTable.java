@@ -1,5 +1,6 @@
 package com.chaldea.visualparsing.parsing;
 
+import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.exception.BaseException;
 import com.chaldea.visualparsing.exception.SLRConflictException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
@@ -20,6 +21,7 @@ public class SLRParsingTable extends LRParsingTable {
             throw new BaseException("grammar 为 empty");
         }
         lr0Collection = new CanonicalLR0Collection(grammar);
+        lrCollection = lr0Collection;
         // +1是因为有结束标记#
         actionTable =
                 new ActionItem[lr0Collection.size()][grammar.getTerminals().size() + 1];
@@ -30,18 +32,16 @@ public class SLRParsingTable extends LRParsingTable {
     }
 
     @Override
-    public Grammar getGrammar() {
-        return lr0Collection.getGrammar();
-    }
-
-    @Override
     public ActionItem action(int state, Terminal terminal) {
-        return null;
+        int index = getSymbolNumber(terminal);
+        return actionTable[state][index];
     }
 
     @Override
     public int go(int state, Nonterminal nonterminal) {
-        return 0;
+        int index = getSymbolNumber(nonterminal);
+        ItemSet itemSet = gotoTable[state][index];
+        return lr0Collection.getItemSetNumber(itemSet);
     }
 
     @Override
@@ -155,22 +155,12 @@ public class SLRParsingTable extends LRParsingTable {
      */
     private int getSymbolNumber(ProductionSymbol symbol) {
         if (symbol instanceof Nonterminal) {
-            return findIndex(nonterminalsOrder, symbol);
+            return ArrayHelper.findIndex(nonterminalsOrder, symbol);
         } else if (symbol instanceof Terminal) {
-            return findIndex(terminalsOrder, symbol);
+            return ArrayHelper.findIndex(terminalsOrder, symbol);
         } else {
             throw new UnknownSymbolException();
         }
-    }
-
-    private static <T> int findIndex(T[] array, T target) {
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].equals(target)) {
-                return i;
-            }
-        }
-        // 如果元素不在数组中，则返回-1
-        return -1;
     }
 
 }

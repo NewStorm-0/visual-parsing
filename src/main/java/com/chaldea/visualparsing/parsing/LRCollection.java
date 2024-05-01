@@ -39,6 +39,16 @@ public abstract class LRCollection implements Iterable<ItemSet> {
         return grammar;
     }
 
+    /**
+     * Gets item set number.
+     *
+     * @param itemSet the item set
+     * @return the item set number
+     */
+    public int getItemSetNumber(ItemSet itemSet) {
+        return itemSetList.indexOf(itemSet);
+    }
+
     @Override
     public Iterator<ItemSet> iterator() {
         return itemSetList.iterator();

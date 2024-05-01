@@ -7,8 +7,23 @@ import com.chaldea.visualparsing.grammar.Terminal;
 public abstract class LRParsingTable {
     protected ActionItem[][] actionTable;
     protected ItemSet[][] gotoTable;
+    protected LRCollection lrCollection;
 
-    public abstract Grammar getGrammar();
+    public Grammar getGrammar() {
+        return lrCollection.getGrammar();
+    }
+
+    public LRCollection getLrCollection() {
+        return lrCollection;
+    }
+
+    public ActionItem[][] getActionTable() {
+        return actionTable;
+    }
+
+    public ItemSet[][] getGotoTable() {
+        return gotoTable;
+    }
 
     public abstract ActionItem action(int state, Terminal terminal);
 

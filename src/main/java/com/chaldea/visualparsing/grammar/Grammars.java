@@ -42,7 +42,7 @@ public class Grammars {
     }
 
     /**
-     * Gets expression index.获取文法expression的索引
+     * Gets expression index.获取文法expression的索引，index从1开始
      *
      * @param grammar    the grammar
      * @param head       the head
@@ -51,7 +51,7 @@ public class Grammars {
      */
     public static int getExpressionIndex(Grammar grammar, Nonterminal head,
                                          Expression expression) {
-        int index = 0;
+        int index = 1;
         for (Production production : grammar.getProductions()) {
             if (!production.getHead().equals(head)) {
                 index += production.getBody().size();

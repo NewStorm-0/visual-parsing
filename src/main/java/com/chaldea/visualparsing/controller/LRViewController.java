@@ -1,5 +1,6 @@
 package com.chaldea.visualparsing.controller;
 
+import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.debug.LRParsingAlgorithm;
 import com.chaldea.visualparsing.debug.StepwiseAlgorithmDebugger;
 import com.chaldea.visualparsing.grammar.Grammar;
@@ -7,10 +8,10 @@ import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
 import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.parsing.ActionItem;
+import com.chaldea.visualparsing.parsing.ItemSet;
 import com.chaldea.visualparsing.parsing.LRParsingTable;
 import com.chaldea.visualparsing.parsing.SLRParsingTable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -23,10 +24,7 @@ import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class LRViewController {
     @FXML
@@ -44,15 +42,18 @@ public class LRViewController {
      * The Table view.
      * Integer 是状态，ActionItem 是表项。在 GOTO 列的表项，
      * ActionItem 中的 action 无效，只使用 number 代表转换的状态
+     *
+     * <p>也许应该将ActionItem换为LRParsingTable，这样就可以更方便
+     * 的添加表格数据和设置每列的显示</p>
      */
     @FXML
-    private TableView<Pair<Integer, ActionItem>> tableView;
+    private TableView<Pair<Integer, ActionItem[]>> tableView;
     @FXML
-    private TableColumn<Pair<Integer, ActionItem>, Integer> stateColumn;
+    private TableColumn<Pair<Integer, ActionItem[]>, Integer> stateColumn;
     @FXML
-    private TableColumn<Pair<Integer, ActionItem>, String> actionColumn;
+    private TableColumn<Pair<Integer, ActionItem[]>, String> actionColumn;
     @FXML
-    private TableColumn<Pair<Integer, ActionItem>, Integer> gotoColumn;
+    private TableColumn<Pair<Integer, ActionItem[]>, Integer> gotoColumn;
 
     private Grammar grammar;
     private LRParsingTable lrParsingTable;
@@ -101,6 +102,7 @@ public class LRViewController {
         lrParsingAlgorithm.setLrParsingTable(lrParsingTable);
         setActionColumns();
         setGotoColumns();
+        setTableViewDate();
     }
 
 
@@ -117,13 +119,18 @@ public class LRViewController {
      * Sets action columns.
      */
     private void setActionColumns() {
-        List<TableColumn<Pair<Integer, ActionItem>, String>> actionColumnsList
+        List<TableColumn<Pair<Integer, ActionItem[]>, String>> actionColumnsList
                 = new ArrayList<>(grammar.getTerminals().size() + 1);
-        for (Terminal terminal : lrParsingTable.getActionColumnsHeader()) {
-            TableColumn<Pair<Integer, ActionItem>, String> temp =
+        Terminal[] actionColumnsHeader = lrParsingTable.getActionColumnsHeader();
+        for (Terminal terminal : actionColumnsHeader) {
+            TableColumn<Pair<Integer, ActionItem[]>, String> temp =
                     new TableColumn<>(terminal.getValue());
             temp.setCellValueFactory(cellData -> {
-                ActionItem actionItem = cellData.getValue().getValue();
+                int index = ArrayHelper.findIndex(actionColumnsHeader, terminal);
+                ActionItem actionItem = cellData.getValue().getValue()[index];
+                if (actionItem == null) {
+                    return null;
+                }
                 String displayText = switch (actionItem.action()) {
                     case SHIFT -> "s" + actionItem.number();
                     case REDUCE -> "r" + actionItem.number();
@@ -139,18 +146,46 @@ public class LRViewController {
     }
 
     private void setGotoColumns() {
-        List<TableColumn<Pair<Integer, ActionItem>, Integer>> gotoColumnsList
+        List<TableColumn<Pair<Integer, ActionItem[]>, Integer>> gotoColumnsList
                 = new ArrayList<>(grammar.getNonterminals().size());
-        for (Nonterminal nonterminal : lrParsingTable.getGotoColumnsHeader()) {
-            TableColumn<Pair<Integer, ActionItem>, Integer> temp =
-                    new TableColumn<>(nonterminal.getValue());
-            temp.setCellValueFactory(cellData ->
-                    new ReadOnlyObjectWrapper<>(cellData.getValue().getValue().number()));
-            temp.setEditable(false);
-            temp.setSortable(false);
+        Nonterminal[] gotoColumnsHeader = lrParsingTable.getGotoColumnsHeader();
+        for (Nonterminal nonterminal : gotoColumnsHeader) {
+            TableColumn<Pair<Integer, ActionItem[]>, Integer> temp = getGotoNonterminalColumn(nonterminal, gotoColumnsHeader);
             gotoColumnsList.add(temp);
         }
         gotoColumn.getColumns().addAll(gotoColumnsList);
+    }
+
+    private TableColumn<Pair<Integer, ActionItem[]>, Integer> getGotoNonterminalColumn(Nonterminal nonterminal, Nonterminal[] gotoColumnsHeader) {
+        TableColumn<Pair<Integer, ActionItem[]>, Integer> temp =
+                new TableColumn<>(nonterminal.getValue());
+        int index = ArrayHelper.findIndex(gotoColumnsHeader, nonterminal)
+                        + actionColumn.getColumns().size();
+        temp.setCellValueFactory(cellData -> {
+            ActionItem actionItem = cellData.getValue().getValue()[index];
+            return actionItem.number() == -1 ?
+                    null : new ReadOnlyObjectWrapper<>(actionItem.number());
+        });
+        temp.setEditable(false);
+        temp.setSortable(false);
+        return temp;
+    }
+
+    private void setTableViewDate() {
+        Collection<Pair<Integer, ActionItem[]>> dataCollection = new LinkedList<>();
+        for (int i = 0; i < lrParsingTable.getLrCollection().size(); i++) {
+            ActionItem[] actionItems = new ActionItem[actionColumn.getColumns().size()
+                    + gotoColumn.getColumns().size()];
+            System.arraycopy(lrParsingTable.getActionTable()[i], 0,
+                    actionItems, 0, lrParsingTable.getActionTable()[i].length);
+            int index = lrParsingTable.getActionTable()[i].length;
+            for (ItemSet itemSet : lrParsingTable.getGotoTable()[i]) {
+                int number = lrParsingTable.getLrCollection().getItemSetNumber(itemSet);
+                actionItems[index++] = new ActionItem(null, number);
+            }
+            dataCollection.add(new Pair<>(i, actionItems));
+        }
+        tableView.getItems().addAll(dataCollection);
     }
 
     private void setLayout() {

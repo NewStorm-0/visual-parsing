@@ -37,16 +37,6 @@ public class CanonicalLR0Collection extends LRCollection {
     }
 
     /**
-     * Gets item set number.
-     *
-     * @param itemSet the item set
-     * @return the item set number
-     */
-    public int getItemSetNumber(ItemSet itemSet) {
-        return itemSetList.indexOf(itemSet);
-    }
-
-    /**
      * Gets go item set.
      *
      * @param itemSet the item set
