@@ -4,6 +4,7 @@ import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
 import com.chaldea.visualparsing.parsing.ActionItem;
+import com.chaldea.visualparsing.parsing.LRParsingTable;
 import com.chaldea.visualparsing.parsing.SLRParsingTable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,6 @@ public class SLRParsingTableTest {
     @Test
     void test() {
         slrParsingTable = new SLRParsingTable(grammar);
-        StringBuilder stringBuilder = new StringBuilder(512);
         Terminal[] actionHeader = new Terminal[] {
                 grammar.getTerminal("id"), grammar.getTerminal("+"),
                 grammar.getTerminal("*"), grammar.getTerminal("("),
@@ -47,6 +47,12 @@ public class SLRParsingTableTest {
                 grammar.getNonterminal("E"), grammar.getNonterminal("T"),
                 grammar.getNonterminal("F")
         };
+        logger.info('\n' + lrParsingTableToString(slrParsingTable, actionHeader, gotoHeader));
+    }
+
+    static String lrParsingTableToString(LRParsingTable table, Terminal[] actionHeader,
+                                         Nonterminal[] gotoHeader) {
+        StringBuilder stringBuilder = new StringBuilder(512);
         stringBuilder.append(" ").append('\t');
         for (Terminal terminal : actionHeader) {
             stringBuilder.append(terminal.getValue()).append('\t');
@@ -55,14 +61,14 @@ public class SLRParsingTableTest {
             stringBuilder.append(nonterminal.getValue()).append('\t');
         }
         stringBuilder.append('\n');
-        for (int i = 0; i < slrParsingTable.getLrCollection().size(); i++) {
+        for (int i = 0; i < table.getLrCollection().size(); i++) {
             stringBuilder.append(i).append('\t');
             for (Terminal terminal : actionHeader) {
-                stringBuilder.append(convertActionItemToString(slrParsingTable.action(i
-                        , terminal))).append('\t');
+                stringBuilder.append(ActionItem.toString(
+                        table.action(i, terminal))).append('\t');
             }
             for (Nonterminal nonterminal : gotoHeader) {
-                int value = slrParsingTable.go(i, nonterminal);
+                int value = table.go(i, nonterminal);
                 if (value != -1) {
                     stringBuilder.append(value);
                 }
@@ -71,24 +77,7 @@ public class SLRParsingTableTest {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             stringBuilder.append('\n');
         }
-        logger.info('\n' + stringBuilder.toString());
+        return stringBuilder.toString();
     }
-
-    private static String convertActionItemToString(ActionItem actionItem) {
-        if (actionItem == null) {
-            return "";
-        }
-        if (actionItem.action() == ActionItem.Action.ACCEPT) {
-            return "acc";
-        }
-        if (actionItem.action() == ActionItem.Action.REDUCE) {
-            return "r" + actionItem.number();
-        }
-        if (actionItem.action() == ActionItem.Action.SHIFT) {
-            return "s" + actionItem.number();
-        }
-        return String.valueOf(actionItem.number());
-    }
-
 
 }

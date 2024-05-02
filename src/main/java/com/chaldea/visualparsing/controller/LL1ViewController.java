@@ -132,6 +132,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
         for (Map.Entry<Nonterminal, Integer> entry : parsingTable.getNonterminalMap().entrySet()) {
             tableData.add(new Pair<>(entry.getKey(), parsingTable.getTable()[entry.getValue()]));
         }
+        tableView.getItems().clear();
         tableView.getItems().addAll(tableData);
     }
 

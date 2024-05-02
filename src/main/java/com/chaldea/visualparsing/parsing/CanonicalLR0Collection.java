@@ -22,6 +22,7 @@ public class CanonicalLR0Collection extends LRCollection {
         super(grammar);
         setAugmentedGrammar();
         setItemSetList();
+        logger.debug("LR项集：\n" + this);
     }
 
     public List<ItemSet> getItemSetList() {
@@ -38,6 +39,7 @@ public class CanonicalLR0Collection extends LRCollection {
 
     /**
      * Gets go item set.
+     * 返回的是itemSetList中的元素，而不是一个新的ItemSet对象
      *
      * @param itemSet the item set
      * @param symbol  the symbol

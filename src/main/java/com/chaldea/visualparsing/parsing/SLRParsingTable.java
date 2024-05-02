@@ -2,11 +2,9 @@ package com.chaldea.visualparsing.parsing;
 
 import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.exception.BaseException;
-import com.chaldea.visualparsing.exception.SLRConflictException;
+import com.chaldea.visualparsing.exception.LRConflictException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
 import com.chaldea.visualparsing.grammar.*;
-
-import java.util.Arrays;
 
 /**
  * The type Slr parsing table.SLR语法分析表
@@ -71,7 +69,7 @@ public class SLRParsingTable extends LRParsingTable {
      *
      * @param item    the item
      * @param itemSet the item set
-     * @throws SLRConflictException SLR分析冲突
+     * @throws LRConflictException LR分析冲突
      */
     private void generateActionItem(Item item, ItemSet itemSet) {
         ProductionSymbol symbol = item.getCurrentSymbol();
@@ -83,31 +81,38 @@ public class SLRParsingTable extends LRParsingTable {
             }
             int goNumber = lr0Collection.getGoItemSetNumber(itemSet, item.getCurrentSymbol());
             int colNumber = getSymbolNumber(symbol);
-            if (actionTable[rowNumber][colNumber] != null) {
-                throw new SLRConflictException(rowNumber, itemSet, (Terminal) symbol);
+            ActionItem actionItem = new ActionItem(ActionItem.Action.SHIFT, goNumber);
+            // 若表项不为空，且表项内容不同，则报错。
+            if (actionTable[rowNumber][colNumber] != null
+                    && !actionItem.equals(actionTable[rowNumber][colNumber])) {
+                throw new LRConflictException(rowNumber, itemSet, (Terminal) symbol,
+                        actionTable[rowNumber][colNumber], actionItem);
             }
-            actionTable[rowNumber][colNumber] = new ActionItem(ActionItem.Action.SHIFT,
-                    goNumber);
+            actionTable[rowNumber][colNumber] = actionItem;
         } else if (item.getHead().equals(lr0Collection.getAugmentedGrammar().getStartSymbol())) {
             // S'→S·
             int colNumber = getSymbolNumber(Terminal.END_MARKER);
-            if (actionTable[rowNumber][colNumber] != null) {
-                throw new SLRConflictException(rowNumber, itemSet, (Terminal) symbol);
+            ActionItem actionItem = new ActionItem(ActionItem.Action.ACCEPT, -1);
+            if (actionTable[rowNumber][colNumber] != null
+                    && !actionItem.equals(actionTable[rowNumber][colNumber])) {
+                throw new LRConflictException(rowNumber, itemSet, Terminal.END_MARKER,
+                        actionTable[rowNumber][colNumber], actionItem);
             }
-            actionTable[rowNumber][colNumber] = new ActionItem(ActionItem.Action.ACCEPT
-                    , -1);
+            actionTable[rowNumber][colNumber] = actionItem;
         } else {
             // A→α·
             LL1Parser ll1Parser = new LL1Parser(lr0Collection.getAugmentedGrammar());
             for (Terminal terminal : ll1Parser.follow(item.getHead())) {
                 int colNumber = getSymbolNumber(terminal);
-                if (actionTable[rowNumber][colNumber] != null) {
-                    throw new SLRConflictException(rowNumber, itemSet, (Terminal) symbol);
+                ActionItem actionItem = new ActionItem(ActionItem.Action.REDUCE,
+                        Grammars.getExpressionIndex(lr0Collection.getOriginalGrammar(),
+                                item.getHead(), item.getExpression()));
+                if (actionTable[rowNumber][colNumber] != null
+                        && !actionItem.equals(actionTable[rowNumber][colNumber])) {
+                    throw new LRConflictException(rowNumber, itemSet, terminal,
+                            actionTable[rowNumber][colNumber], actionItem);
                 }
-                actionTable[rowNumber][colNumber] =
-                        new ActionItem(ActionItem.Action.REDUCE,
-                        Grammars.getExpressionIndex(lr0Collection.getOriginalGrammar(),item.getHead(), item.getExpression())
-                );
+                actionTable[rowNumber][colNumber] = actionItem;
             }
         }
     }

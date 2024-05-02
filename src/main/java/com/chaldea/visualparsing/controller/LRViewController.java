@@ -7,10 +7,7 @@ import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
 import com.chaldea.visualparsing.gui.DialogShower;
-import com.chaldea.visualparsing.parsing.ActionItem;
-import com.chaldea.visualparsing.parsing.ItemSet;
-import com.chaldea.visualparsing.parsing.LRParsingTable;
-import com.chaldea.visualparsing.parsing.SLRParsingTable;
+import com.chaldea.visualparsing.parsing.*;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -88,6 +85,7 @@ public class LRViewController {
                 break;
             case LR0:
                 grammarTypeLabel.setText("LR(0)");
+                lrParsingTable = new LR0ParsingTable(grammar);
                 break;
             case LR1:
                 grammarTypeLabel.setText("LR(1)");
@@ -189,6 +187,7 @@ public class LRViewController {
             }
             dataCollection.add(new Pair<>(i, actionItems));
         }
+        tableView.getItems().clear();
         tableView.getItems().addAll(dataCollection);
     }
 

@@ -1,7 +1,5 @@
 package com.chaldea.visualparsing.parsing;
 
-import org.controlsfx.control.action.Action;
-
 /**
  * The type Action item.
  *
@@ -24,5 +22,21 @@ public record ActionItem(Action action, int number) {
          * 接受
          */
         ACCEPT;
+    }
+
+    public static String toString(ActionItem actionItem) {
+        if (actionItem == null) {
+            return "";
+        }
+        if (actionItem.action() == ActionItem.Action.ACCEPT) {
+            return "acc";
+        }
+        if (actionItem.action() == ActionItem.Action.REDUCE) {
+            return "r" + actionItem.number();
+        }
+        if (actionItem.action() == ActionItem.Action.SHIFT) {
+            return "s" + actionItem.number();
+        }
+        return String.valueOf(actionItem.number());
     }
 }

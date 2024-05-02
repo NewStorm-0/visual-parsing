@@ -22,7 +22,7 @@
                               <Font name="System Bold" size="22.0" />
                            </font>
                         </Label>
-                        <Label layoutX="72.0" text="语法分析表">
+                        <Label layoutX="108.0" text="语法分析表">
                            <font>
                               <Font name="System Bold" size="22.0" />
                            </font>
@@ -34,8 +34,7 @@
                               <TableColumn fx:id="gotoColumn" prefWidth="75.0" text="GOTO" />
                           </columns>
                         </TableView>
-                        <Button onAction="#showLrCollection" layoutX="196.0" mnemonicParsing="false"
-                                 prefHeight="29.0" prefWidth="92.0" text="查看项集族">
+                        <Button layoutX="232.0" mnemonicParsing="false" onAction="#showLrCollection" prefHeight="29.0" prefWidth="92.0" text="查看项集族">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
