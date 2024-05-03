@@ -78,16 +78,7 @@ public class CanonicalLR0Collection extends LRCollection {
      * 产生式S'→S而得到的文法</p>
      */
     private void setAugmentedGrammar() {
-        augmentedGrammar = (Grammar) grammar.clone();
-        // 加上新开始符号S'
-        Nonterminal oldStartSymbol = grammar.getStartSymbol();
-        Nonterminal newStartSymbol = Grammars.getAuxiliaryNonterminal(augmentedGrammar,
-                augmentedGrammar.getStartSymbol());
-        augmentedGrammar.addNonterminal(newStartSymbol);
-        augmentedGrammar.setStartSymbol(newStartSymbol);
-        // 加上产生式S'→S
-        augmentedGrammar.addExpression(newStartSymbol,
-                new Expression(new ProductionSymbol[]{oldStartSymbol}));
+        augmentedGrammar = Grammars.getAugmentedGrammar(grammar);
     }
 
     /**

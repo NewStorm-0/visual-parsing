@@ -1,6 +1,7 @@
 package com.chaldea.visualparsing.parsing;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The type Item set.项集
@@ -112,9 +113,37 @@ public class ItemSet implements Iterable<Item> {
 
     @Override
     public String toString() {
+        boolean areLR1Items = true;
+        for (Item item : items) {
+            if (!(item instanceof LR1Item)) {
+                areLR1Items = false;
+                break;
+            }
+        }
+        if (areLR1Items) {
+            return lrItemsToString();
+        }
         StringBuilder stringBuilder = new StringBuilder();
         for (Item item : items) {
             stringBuilder.append(item).append(" ");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        return stringBuilder.toString();
+    }
+
+    private String lrItemsToString() {
+        Map<Item, List<LR1Item>> lr1ItemsMap = items.stream().map(n -> (LR1Item) n)
+                .collect(Collectors.groupingBy(LR1Item::getItem, Collectors.toList()));
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<Item, List<LR1Item>> entry : lr1ItemsMap.entrySet()) {
+            Item item = entry.getKey();
+            List<LR1Item> lr1Items = entry.getValue();
+            stringBuilder.append(item).append(",");
+            for (LR1Item lr1Item : lr1Items) {
+                stringBuilder.append(lr1Item.getLookahead().getValue()).append("/");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            stringBuilder.append(" ");
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();

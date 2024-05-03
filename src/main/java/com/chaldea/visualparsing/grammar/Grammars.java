@@ -289,6 +289,25 @@ public class Grammars {
     }
 
     /**
+     * Sets augmented grammar.生成增广文法
+     * <p>如果G开始符号为S，那么G的增广文法G'就是在G中加上新开始符号S'和
+     * 产生式S'→S而得到的文法</p>
+     */
+    public static Grammar getAugmentedGrammar(Grammar grammar) {
+        Grammar augmentedGrammar = (Grammar) grammar.clone();
+        // 加上新开始符号S'
+        Nonterminal oldStartSymbol = grammar.getStartSymbol();
+        Nonterminal newStartSymbol = Grammars.getAuxiliaryNonterminal(augmentedGrammar,
+                augmentedGrammar.getStartSymbol());
+        augmentedGrammar.addNonterminal(newStartSymbol);
+        augmentedGrammar.setStartSymbol(newStartSymbol);
+        // 加上产生式S'→S
+        augmentedGrammar.addExpression(newStartSymbol,
+                new Expression(new ProductionSymbol[]{oldStartSymbol}));
+        return augmentedGrammar;
+    }
+
+    /**
      * Gets longest common prefix.获取最长公共前缀。调用getLongestCommonPrefixRunner方法
      *
      * @param production the production

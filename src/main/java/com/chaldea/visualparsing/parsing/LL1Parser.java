@@ -25,11 +25,7 @@ public class LL1Parser {
      * @param grammar the grammar
      */
     public LL1Parser(Grammar grammar) {
-        this.grammar = grammar;
-        symbolFirstMap =
-                new HashMap<>(grammar.getTerminals().size()
-                        + grammar.getNonterminals().size());
-        symbolFollowMap = new HashMap<>(grammar.getNonterminals().size());
+        setGrammar(grammar);
     }
 
     public Grammar getGrammar() {
@@ -38,6 +34,10 @@ public class LL1Parser {
 
     public void setGrammar(Grammar grammar) {
         this.grammar = grammar;
+        symbolFirstMap =
+                new HashMap<>(grammar.getTerminals().size()
+                        + grammar.getNonterminals().size());
+        symbolFollowMap = new HashMap<>(grammar.getNonterminals().size());
     }
 
     /**
