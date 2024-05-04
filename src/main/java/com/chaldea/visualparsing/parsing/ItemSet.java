@@ -2,6 +2,7 @@ package com.chaldea.visualparsing.parsing;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The type Item set.项集
@@ -87,6 +88,10 @@ public class ItemSet implements Iterable<Item> {
      */
     public boolean contains(Item item) {
         return items.contains(item);
+    }
+
+    public Stream<Item> stream() {
+        return items.stream();
     }
 
     @Override

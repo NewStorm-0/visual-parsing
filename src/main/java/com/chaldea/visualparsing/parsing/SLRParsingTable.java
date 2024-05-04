@@ -120,22 +120,6 @@ public class SLRParsingTable extends LRParsingTable {
         }
     }
 
-    /**
-     * Gets symbol number.获取文法符号对应的序号
-     *
-     * @param symbol the symbol
-     * @return the symbol number
-     */
-    private int getSymbolNumber(ProductionSymbol symbol) {
-        if (symbol instanceof Nonterminal) {
-            return ArrayHelper.findIndex(nonterminalsOrder, symbol);
-        } else if (symbol instanceof Terminal) {
-            return ArrayHelper.findIndex(terminalsOrder, symbol);
-        } else {
-            throw new UnknownSymbolException();
-        }
-    }
-
 }
 
 

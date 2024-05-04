@@ -1,8 +1,11 @@
 package com.chaldea.visualparsing.parsing;
 
+import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.exception.BaseException;
+import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
+import com.chaldea.visualparsing.grammar.ProductionSymbol;
 import com.chaldea.visualparsing.grammar.Terminal;
 
 public abstract class LRParsingTable {
@@ -51,6 +54,22 @@ public abstract class LRParsingTable {
 
     public Nonterminal[] getGotoColumnsHeader() {
         return nonterminalsOrder.clone();
+    }
+
+    /**
+     * Gets symbol number.获取文法符号对应的序号
+     *
+     * @param symbol the symbol
+     * @return the symbol number
+     */
+    protected int getSymbolNumber(ProductionSymbol symbol) {
+        if (symbol instanceof Nonterminal) {
+            return ArrayHelper.findIndex(nonterminalsOrder, symbol);
+        } else if (symbol instanceof Terminal) {
+            return ArrayHelper.findIndex(terminalsOrder, symbol);
+        } else {
+            throw new UnknownSymbolException();
+        }
     }
 
     /**
