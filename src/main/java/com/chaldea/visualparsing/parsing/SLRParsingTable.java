@@ -10,21 +10,16 @@ import com.chaldea.visualparsing.grammar.*;
  * The type Slr parsing table.SLR语法分析表
  */
 public class SLRParsingTable extends LRParsingTable {
-    private Terminal[] terminalsOrder;
-    private Nonterminal[] nonterminalsOrder;
     private final CanonicalLR0Collection lr0Collection;
 
     public SLRParsingTable(Grammar grammar) {
-        if (grammar.isEmpty()) {
-            throw new BaseException("grammar 为 empty");
-        }
+        super(grammar);
         lr0Collection = new CanonicalLR0Collection(grammar);
         lrCollection = lr0Collection;
         // +1是因为有结束标记#
         actionTable =
                 new ActionItem[lr0Collection.size()][grammar.getTerminals().size() + 1];
         gotoTable = new ItemSet[lr0Collection.size()][grammar.getNonterminals().size()];
-        initProductionSymbolsOrder(grammar);
         constructActionTable();
         constructGotoTable();
     }
@@ -41,17 +36,6 @@ public class SLRParsingTable extends LRParsingTable {
         ItemSet itemSet = gotoTable[state][index];
         return lr0Collection.getItemSetNumber(itemSet);
     }
-
-    @Override
-    public Terminal[] getActionColumnsHeader() {
-        return terminalsOrder.clone();
-    }
-
-    @Override
-    public Nonterminal[] getGotoColumnsHeader() {
-        return nonterminalsOrder.clone();
-    }
-
 
     /**
      * Construct action table.构建ACTION表
@@ -133,22 +117,6 @@ public class SLRParsingTable extends LRParsingTable {
                     gotoTable[rowNumber][colNumber] = null;
                 }
             }
-        }
-    }
-
-    private void initProductionSymbolsOrder(Grammar grammar) {
-        terminalsOrder = new Terminal[grammar.getTerminals().size() + 1];
-        nonterminalsOrder = new Nonterminal[grammar.getNonterminals().size()];
-        int index = 0;
-        for (Terminal terminal : grammar.getTerminals()) {
-            terminalsOrder[index] = terminal;
-            index += 1;
-        }
-        terminalsOrder[index] = Terminal.END_MARKER;
-        index = 0;
-        for (Nonterminal nonterminal : grammar.getNonterminals()) {
-            nonterminalsOrder[index] = nonterminal;
-            index += 1;
         }
     }
 
