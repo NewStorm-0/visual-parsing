@@ -145,6 +145,7 @@ public class LRViewController {
             temp.setSortable(false);
             actionColumnsList.add(temp);
         }
+        actionColumn.getColumns().clear();
         actionColumn.getColumns().addAll(actionColumnsList);
     }
 
@@ -156,6 +157,7 @@ public class LRViewController {
             TableColumn<Pair<Integer, ActionItem[]>, Integer> temp = getGotoNonterminalColumn(nonterminal, gotoColumnsHeader);
             gotoColumnsList.add(temp);
         }
+        gotoColumn.getColumns().clear();
         gotoColumn.getColumns().addAll(gotoColumnsList);
     }
 
