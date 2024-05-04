@@ -22,6 +22,35 @@ public class LR1Collection extends LRCollection {
         setItems();
     }
 
+    public Grammar getAugmentedGrammar() {
+        return augmentedGrammar;
+    }
+
+    /**
+     * Gets go item set.
+     * 返回的是itemSetList中的元素，而不是一个新的ItemSet对象
+     *
+     * @param itemSet the item set
+     * @param symbol  the symbol
+     * @return the go item set
+     */
+    public ItemSet getGoItemSet(ItemSet itemSet, ProductionSymbol symbol) {
+        ItemSet goItemSet = go(itemSet, symbol);
+        int index = getItemSetNumber(goItemSet);
+        return index == -1 ? null : itemSetList.get(index);
+    }
+
+    /**
+     * Gets go item set number.
+     *
+     * @param itemSet the item set
+     * @param symbol  the symbol
+     * @return the go item set number
+     */
+    public int getGoItemSetNumber(ItemSet itemSet, ProductionSymbol symbol) {
+        return getItemSetNumber(go(itemSet, symbol));
+    }
+
     private ItemSet closure(ItemSet itemSet) {
         ItemSet closureItemSet = new ItemSet(itemSet.getItemsCopy());
         ItemSet lastStepItemSet;
@@ -62,7 +91,7 @@ public class LR1Collection extends LRCollection {
     }
 
     /**
-     * 对于G'每个产生式 B→γ ，将 B→·γ,b 加入到集合 Itemset 中，其中 b 是
+     * 对于G'每个产生式 B→γ ，将 B→·γ,b 加入到集合 itemSet 中，其中 b 是
      * FIRST(βa) 中每一个终结符号
      *
      * @param symbols    代表 βa

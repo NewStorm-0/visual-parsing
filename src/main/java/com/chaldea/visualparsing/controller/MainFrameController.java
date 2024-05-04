@@ -139,6 +139,13 @@ public class MainFrameController {
         openLRTab();
     }
 
+    @FXML
+    private void setLR1Tab() {
+        ControllerMediator.getInstance().getLrViewController()
+                .setLRType(LRParsingTable.Type.LR1);
+        openLRTab();
+    }
+
     private void openLRTab() {
         lrTab.setDisable(false);
         tabPane.getSelectionModel().select(lrTab);

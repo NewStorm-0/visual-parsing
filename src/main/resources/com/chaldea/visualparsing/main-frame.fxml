@@ -23,6 +23,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#openLL1Tab" text="LL(1)分析" />
                   <MenuItem mnemonicParsing="false" onAction="#setLR0Tab" text="LR(0)分析" />
                   <MenuItem mnemonicParsing="false" onAction="#setSLRTab" text="SLR(1)分析" />
+                  <MenuItem mnemonicParsing="false" onAction="#setLR1Tab" text="LR(1)分析" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" onAction="#openUserManual" text="帮助">

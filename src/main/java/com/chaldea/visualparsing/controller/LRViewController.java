@@ -89,6 +89,7 @@ public class LRViewController {
                 break;
             case LR1:
                 grammarTypeLabel.setText("LR(1)");
+                lrParsingTable = new LR1ParsingTable(grammar);
                 break;
             case LALR:
                 grammarTypeLabel.setText("LALR");
