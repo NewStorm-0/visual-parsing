@@ -1,6 +1,7 @@
 package com.chaldea.visualparsing.grammar;
 
 import com.chaldea.visualparsing.exception.BaseException;
+import com.chaldea.visualparsing.exception.grammar.EmptyExpressionException;
 import com.chaldea.visualparsing.exception.grammar.IllegalSymbolException;
 
 import java.io.Serializable;
@@ -32,10 +33,10 @@ public class Expression implements Serializable, Cloneable {
 
     private void setValue(ProductionSymbol[] value) {
         if (value == null) {
-            throw new BaseException("Expression.value 为空");
+            throw new EmptyExpressionException("Expression.value 为空");
         }
         if (value.length == 0) {
-            throw new BaseException("Expression.value.length 为 0");
+            throw new EmptyExpressionException("Expression.value.length 为 0");
         }
         if (Arrays.stream(value).toList().contains(Terminal.EMPTY_STRING) && value.length > 1) {
             throw new IllegalSymbolException("Expression.value含有空串时不能有其它符号, value:" + Arrays.toString(value));

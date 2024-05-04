@@ -1,5 +1,6 @@
 package com.chaldea.visualparsing.gui;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import org.controlsfx.dialog.ExceptionDialog;
@@ -20,7 +21,7 @@ public class DialogShower {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setTitle("错误：");
         exceptionDialog.setHeaderText("一个异常发生了");
-        exceptionDialog.showAndWait();
+        Platform.runLater(exceptionDialog::showAndWait);
     }
 
     /**
@@ -43,7 +44,7 @@ public class DialogShower {
         alert.setTitle("错误");
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
-        alert.showAndWait();
+        Platform.runLater(alert::showAndWait);
     }
 
     public static Optional<String> showInputDialog(String headerText, String contentText) {
@@ -51,6 +52,7 @@ public class DialogShower {
         inputDialog.setTitle("提示");
         inputDialog.setHeaderText(headerText);
         inputDialog.setContentText(contentText);
+        // 此处没想到简单的好的办法来使用 Platform.runLater
         return inputDialog.showAndWait();
     }
 
@@ -59,7 +61,7 @@ public class DialogShower {
         alert.setTitle("警告");
         alert.setHeaderText("请您注意！");
         alert.setContentText(contentText);
-        alert.showAndWait();
+        Platform.runLater(alert::showAndWait);
     }
 
     public static void showInformationDialog(String contentText) {
@@ -67,6 +69,6 @@ public class DialogShower {
         alert.setTitle("提示");
         alert.setHeaderText("请查收！");
         alert.setContentText(contentText);
-        alert.showAndWait();
+        Platform.runLater(alert::showAndWait);
     }
 }

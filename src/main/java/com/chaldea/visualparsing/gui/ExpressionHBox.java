@@ -1,9 +1,7 @@
 package com.chaldea.visualparsing.gui;
 
 import com.chaldea.visualparsing.controller.ControllerMediator;
-import com.chaldea.visualparsing.exception.grammar.IllegalSymbolException;
-import com.chaldea.visualparsing.exception.grammar.RepeatedProductionException;
-import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
+import com.chaldea.visualparsing.exception.grammar.*;
 import com.chaldea.visualparsing.grammar.*;
 import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -185,6 +183,10 @@ public class ExpressionHBox extends HBox {
                 DialogShower.showErrorDialog(e.getMessage() + "不在非终结符中");
             } catch (RepeatedProductionException e) {
                 DialogShower.showErrorDialog("重复的表达式");
+            } catch (EmptyHeadProductionException e) {
+                DialogShower.showErrorDialog("产生式头不可以为空");
+            } catch (EmptyExpressionException e) {
+                DialogShower.showErrorDialog("产生式体不可以为空");
             }
         }
     }
@@ -210,9 +212,13 @@ public class ExpressionHBox extends HBox {
      * 根据<>对字符串进行分割，并构造{@link com.chaldea.visualparsing.grammar.Expression}对象
      *
      * @return Expression 对象
+     * @throws EmptyExpressionException 产生式体为空异常
      */
     private Expression parseRightTextField() {
         String input = rightTextField.getText();
+        if (input.isBlank()) {
+            throw new EmptyExpressionException();
+        }
         List<ProductionSymbol> productionSymbolList = new ArrayList<>(input.length());
         // 定义正则表达式匹配被 <> 括住的部分
         Pattern pattern = Pattern.compile("<([^<>]+?)>");
@@ -237,6 +243,9 @@ public class ExpressionHBox extends HBox {
     }
 
     private Nonterminal parseLeftTextField() {
+        if (leftTextField.getText().isBlank()) {
+            throw new EmptyHeadProductionException();
+        }
         Set<Nonterminal> nonterminalSet = ControllerMediator.getInstance().getNonterminalCopy();
         Nonterminal nonterminalSymbol = new Nonterminal(leftTextField.getText());
         if (nonterminalSet.contains(nonterminalSymbol)) {

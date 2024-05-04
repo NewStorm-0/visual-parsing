@@ -5,6 +5,7 @@ import com.chaldea.visualparsing.exception.grammar.RepeatedSymbolException;
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.gui.ExpressionHBox;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -342,7 +343,7 @@ public class GrammarViewController {
     @FXML
     private void addExpressionHBox() {
         if (expressionHBoxList.isEmpty()) {
-            expressionHBoxList.add(new ExpressionHBox());
+            Platform.runLater(() -> expressionHBoxList.add(new ExpressionHBox()));
             return;
         }
         ExpressionHBox lastExpressionHBox = expressionHBoxList.get(expressionHBoxList.size() - 1);
@@ -359,7 +360,7 @@ public class GrammarViewController {
                 lastExpressionHBox.toNormalState();
             }).start();
         } else {
-            expressionHBoxList.add(new ExpressionHBox());
+            Platform.runLater(() -> expressionHBoxList.add(new ExpressionHBox()));
         }
 
     }
