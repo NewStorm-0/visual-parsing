@@ -3,6 +3,7 @@ package com.chaldea.visualparsing.gui;
 import com.chaldea.visualparsing.controller.ControllerMediator;
 import com.chaldea.visualparsing.exception.grammar.*;
 import com.chaldea.visualparsing.grammar.*;
+import javafx.geometry.Insets;
 import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import javafx.event.ActionEvent;
@@ -31,6 +32,7 @@ public class ExpressionHBox extends HBox {
     public AutoCompletionBinding<Nonterminal> leftAutoCompletionBinding;
     @Deprecated
     public AutoCompletionBinding<ProductionSymbol> rightAutoCompletionBinding;
+    private final Label numberLabel = new Label();
     private final TextField leftTextField = new TextField();
     private final TextField rightTextField = new TextField();
     private final Button editButton = new Button("编辑");
@@ -57,6 +59,9 @@ public class ExpressionHBox extends HBox {
         this.setAlignment(Pos.CENTER_LEFT);
         this.setFillHeight(false);
         this.setSpacing(15.0);
+        numberLabel.setFont(new Font("System Regular", 18.0));
+        numberLabel.getStyleClass().add("production-number");
+        HBox.setMargin(numberLabel, new Insets(0, -10, 0, 0));
         // 设置 头输入框 与 体输入框 自动提示
         leftAutoCompletionBinding = TextFields.bindAutoCompletion(leftTextField,
                 ControllerMediator.getInstance().getNonterminalCopy());
@@ -64,11 +69,11 @@ public class ExpressionHBox extends HBox {
 //                rightSuggestionProvider());
 
         leftTextField.setEditable(false);
-        leftTextField.prefWidthProperty().bind(widthProperty().subtract(220).divide(3));
+        leftTextField.prefWidthProperty().bind(widthProperty().subtract(260).divide(3));
         leftTextField.setPromptText("输入产生式头(非终结符)");
         leftTextField.getStyleClass().add("production-text-field");
         rightTextField.setEditable(false);
-        rightTextField.prefWidthProperty().bind(widthProperty().subtract(220).divide((double) 3 / 2));
+        rightTextField.prefWidthProperty().bind(widthProperty().subtract(260).divide((double) 3 / 2));
         rightTextField.setPromptText("输入产生式体");
         rightTextField.getStyleClass().add("production-text-field");
 
@@ -81,13 +86,20 @@ public class ExpressionHBox extends HBox {
         editButton.getStyleClass().add("production-button");
         deleteButton.setOnAction(this::delete);
         deleteButton.getStyleClass().add("production-button");
-        this.getChildren().addAll(leftTextField, rightArrow, rightTextField, editButton, deleteButton);
+        this.getChildren().addAll(numberLabel, leftTextField, rightArrow, rightTextField,
+                editButton, deleteButton);
     }
 
     public ExpressionHBox(Nonterminal head, Expression expression) {
         this();
         setLeftTextField(head);
         setRightTextField(expression);
+        setNumberLabel();
+    }
+
+    public ExpressionHBox(int number) {
+        this();
+        numberLabel.setText(number + ".");
     }
 
     /**
@@ -150,6 +162,24 @@ public class ExpressionHBox extends HBox {
             }
         }
         rightTextField.setText(sb.toString());
+    }
+
+    public void setNumberLabel() {
+        if (expressionHead == null || expressionBody == null) {
+            int index = 1;
+            Grammar grammar = ControllerMediator.getInstance().getGrammar();
+            for (Production production : grammar.getProductions()) {
+                index += production.getBody().size();
+            }
+            numberLabel.setText(index + ".");
+            return;
+        }
+        int index = Grammars.getExpressionIndex(
+                ControllerMediator.getInstance().getGrammar(),
+                expressionHead,
+                expressionBody
+        );
+        numberLabel.setText(index + ".");
     }
 
     private void editOrSave(ActionEvent actionEvent) {

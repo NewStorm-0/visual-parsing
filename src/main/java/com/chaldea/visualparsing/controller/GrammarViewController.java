@@ -315,6 +315,7 @@ public class GrammarViewController {
      */
     public void deleteExpressionHBox(ExpressionHBox expressionHBox) {
         expressionHBoxList.remove(expressionHBox);
+        expressionHBoxList.forEach(ExpressionHBox::setNumberLabel);
     }
 
     public void addExpressionToGrammar(Nonterminal head, Expression body) {
@@ -343,7 +344,7 @@ public class GrammarViewController {
     @FXML
     private void addExpressionHBox() {
         if (expressionHBoxList.isEmpty()) {
-            Platform.runLater(() -> expressionHBoxList.add(new ExpressionHBox()));
+            Platform.runLater(() -> expressionHBoxList.add(new ExpressionHBox(1)));
             return;
         }
         ExpressionHBox lastExpressionHBox = expressionHBoxList.get(expressionHBoxList.size() - 1);
@@ -360,7 +361,8 @@ public class GrammarViewController {
                 lastExpressionHBox.toNormalState();
             }).start();
         } else {
-            Platform.runLater(() -> expressionHBoxList.add(new ExpressionHBox()));
+            Platform.runLater(() ->
+                    expressionHBoxList.add(new ExpressionHBox(expressionHBoxList.size() + 1)));
         }
 
     }

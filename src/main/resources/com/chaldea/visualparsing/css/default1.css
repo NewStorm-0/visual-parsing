@@ -50,3 +50,12 @@
 .production-text-field, .production-button {
     -fx-font-size: 20px;
 }
+
+.production-text-field:readonly {
+    -fx-opacity: 0.8; /* 设置不透明度，让文本框看起来是禁用的 */
+    -fx-background-color: lightgrey; /* 背景色变灰 */
+}
+
+.production-number {
+
+}
