@@ -93,6 +93,7 @@ public class LRViewController {
                 break;
             case LALR:
                 grammarTypeLabel.setText("LALR");
+                lrParsingTable = new LALRParsingTable(grammar);
                 break;
             default:
                 DialogShower.showErrorDialog("未知的LR类型" + parsingTableType);

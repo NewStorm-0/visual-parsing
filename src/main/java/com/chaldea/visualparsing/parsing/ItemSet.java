@@ -1,5 +1,7 @@
 package com.chaldea.visualparsing.parsing;
 
+import com.chaldea.visualparsing.exception.BaseException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,6 +14,10 @@ public class ItemSet implements Iterable<Item> {
 
     public ItemSet(Set<Item> items) {
         this.items = items;
+    }
+
+    public ItemSet(ItemSet itemSet) {
+        this(itemSet.getItemsCopy());
     }
 
     public ItemSet() {
@@ -92,6 +98,24 @@ public class ItemSet implements Iterable<Item> {
 
     public Stream<Item> stream() {
         return items.stream();
+    }
+
+    public void union(ItemSet itemSet) {
+        if (!hasSameCore(itemSet)) {
+            throw new BaseException("LR(1)项集的核心不同");
+        }
+        itemSet.forEach(this::addItem);
+    }
+
+    boolean hasSameCore(ItemSet itemSet) {
+        if (itemSet == null) {
+            return false;
+        }
+        List<Item> items1 = this.items.stream()
+                .map(n -> ((LR1Item) n).getItem()).distinct().toList();
+        List<Item> items2 = itemSet.stream()
+                .map(n -> ((LR1Item) n).getItem()).distinct().toList();
+        return items1.equals(items2);
     }
 
     @Override

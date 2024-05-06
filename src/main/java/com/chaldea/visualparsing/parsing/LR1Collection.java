@@ -51,7 +51,7 @@ public class LR1Collection extends LRCollection {
         return getItemSetNumber(go(itemSet, symbol));
     }
 
-    private ItemSet closure(ItemSet itemSet) {
+    ItemSet closure(ItemSet itemSet) {
         ItemSet closureItemSet = new ItemSet(itemSet.getItemsCopy());
         ItemSet lastStepItemSet;
         do {
@@ -84,7 +84,7 @@ public class LR1Collection extends LRCollection {
         return closureItemSet;
     }
 
-    private ItemSet closure(LR1Item lr1Item) {
+    ItemSet closure(LR1Item lr1Item) {
         ItemSet itemSet = new ItemSet();
         itemSet.addItem(lr1Item);
         return closure(itemSet);
@@ -112,7 +112,7 @@ public class LR1Collection extends LRCollection {
         }
     }
 
-    private ItemSet go(ItemSet itemSet, ProductionSymbol symbol) {
+    ItemSet go(ItemSet itemSet, ProductionSymbol symbol) {
         ItemSet kernelItemSet = new ItemSet();
         itemSet.getItemsCopy()
                 .stream()

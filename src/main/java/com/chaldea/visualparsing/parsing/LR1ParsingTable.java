@@ -9,6 +9,23 @@ import com.chaldea.visualparsing.grammar.Terminal;
 public class LR1ParsingTable extends LRParsingTable {
     private final LR1Collection lr1Collection;
 
+    /**
+     * 该构造方法是为了在LALRParsingTable中复用代码
+     *
+     * @param grammar       the grammar
+     * @param lr1Collection the lr 1 collection
+     */
+    LR1ParsingTable(Grammar grammar, LR1Collection lr1Collection) {
+        super(grammar);
+        this.lr1Collection = lr1Collection;
+        lrCollection = lr1Collection;
+        // +1是因为有结束标记#
+        actionTable =
+                new ActionItem[lr1Collection.size()][grammar.getTerminals().size() + 1];
+        gotoTable = new ItemSet[lr1Collection.size()][grammar.getNonterminals().size()];
+        constructActionTable();
+    }
+
     public LR1ParsingTable(Grammar grammar) {
         super(grammar);
         lrCollection = new LR1Collection(grammar);
