@@ -111,10 +111,10 @@ public class ItemSet implements Iterable<Item> {
         if (itemSet == null) {
             return false;
         }
-        List<Item> items1 = this.items.stream()
-                .map(n -> ((LR1Item) n).getItem()).distinct().toList();
-        List<Item> items2 = itemSet.stream()
-                .map(n -> ((LR1Item) n).getItem()).distinct().toList();
+        Set<Item> items1 = this.items.stream()
+                .map(n -> ((LR1Item) n).getItem()).collect(Collectors.toSet());
+        Set<Item> items2 = itemSet.stream()
+                .map(n -> ((LR1Item) n).getItem()).collect(Collectors.toSet());
         return items1.equals(items2);
     }
 
