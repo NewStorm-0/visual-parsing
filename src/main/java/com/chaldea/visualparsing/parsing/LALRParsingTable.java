@@ -4,6 +4,8 @@ import com.chaldea.visualparsing.exception.LRConflictException;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +18,14 @@ public class LALRParsingTable extends LRParsingTable {
      * 为了复用代码
      */
     private final LR1ParsingTable lr1ParsingTable;
+    private static final Logger logger = LoggerFactory.getLogger(LALRParsingTable.class);
 
     public LALRParsingTable(Grammar grammar) {
         super(grammar);
         lr1Collection = new LR1Collection(grammar);
         lrCollection = lr1Collection;
         unionItemSets();
+        logger.debug("LALR分析表的项集：\n" + lr1Collection);
         lr1ParsingTable = new LR1ParsingTable(grammar, lr1Collection);
         constructActionTable();
         gotoTable = new ItemSet[lr1Collection.size()][grammar.getNonterminals().size()];

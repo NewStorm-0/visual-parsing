@@ -3,6 +3,7 @@ package com.chaldea.visualparsing.controller;
 import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.debug.LRParsingAlgorithm;
 import com.chaldea.visualparsing.debug.StepwiseAlgorithmDebugger;
+import com.chaldea.visualparsing.exception.LRConflictException;
 import com.chaldea.visualparsing.grammar.Grammar;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
@@ -78,26 +79,30 @@ public class LRViewController {
         grammar = ControllerMediator.getInstance().getGrammar();
         LRParsingAlgorithm lrParsingAlgorithm =
                 (LRParsingAlgorithm) algorithmDebugger.getStepwiseAlgorithm();
-        switch (parsingTableType) {
-            case SLR:
-                grammarTypeLabel.setText("SLR");
-                lrParsingTable = new SLRParsingTable(grammar);
-                break;
-            case LR0:
-                grammarTypeLabel.setText("LR(0)");
-                lrParsingTable = new LR0ParsingTable(grammar);
-                break;
-            case LR1:
-                grammarTypeLabel.setText("LR(1)");
-                lrParsingTable = new LR1ParsingTable(grammar);
-                break;
-            case LALR:
-                grammarTypeLabel.setText("LALR");
-                lrParsingTable = new LALRParsingTable(grammar);
-                break;
-            default:
-                DialogShower.showErrorDialog("未知的LR类型" + parsingTableType);
-                break;
+        try {
+            switch (parsingTableType) {
+                case SLR:
+                    grammarTypeLabel.setText("SLR");
+                    lrParsingTable = new SLRParsingTable(grammar);
+                    break;
+                case LR0:
+                    grammarTypeLabel.setText("LR(0)");
+                    lrParsingTable = new LR0ParsingTable(grammar);
+                    break;
+                case LR1:
+                    grammarTypeLabel.setText("LR(1)");
+                    lrParsingTable = new LR1ParsingTable(grammar);
+                    break;
+                case LALR:
+                    grammarTypeLabel.setText("LALR");
+                    lrParsingTable = new LALRParsingTable(grammar);
+                    break;
+                default:
+                    DialogShower.showErrorDialog("未知的LR类型" + parsingTableType);
+                    break;
+            }
+        } catch (LRConflictException e) {
+            DialogShower.showErrorDialog("LR分析冲突");
         }
         lrParsingAlgorithm.setLrParsingTable(lrParsingTable);
         setActionColumns();
@@ -108,6 +113,21 @@ public class LRViewController {
     @FXML
     private void showLrCollection() {
         DialogShower.showInformationDialog(lrParsingTable.getLrCollection().toString());
+    }
+
+    @FXML
+    private void processInputString() {
+
+    }
+
+    @FXML
+    private void resumeDebugger() {
+
+    }
+
+    @FXML
+    private void stepDebugger() {
+
     }
 
     /**
