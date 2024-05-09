@@ -9,13 +9,11 @@ import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
 import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.parsing.*;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
@@ -35,6 +33,14 @@ public class LRViewController {
     private Label grammarTypeLabel;
     @FXML
     private AnchorPane lrTableAnchorPane;
+    @FXML
+    private AnchorPane rightAnchorPane;
+    @FXML
+    private TextField inputStringTextField;
+    @FXML
+    private Button resumeButton;
+    @FXML
+    private  Button stepButton;
 
     /**
      * The Table view.
@@ -69,7 +75,7 @@ public class LRViewController {
     @FXML
     private void initialize() {
         setStateColumnCellFactory();
-        setLayout();
+        Platform.runLater(this::setLayout);
     }
 
     /**

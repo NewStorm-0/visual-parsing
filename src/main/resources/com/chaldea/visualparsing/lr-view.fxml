@@ -14,13 +14,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="rootHBox" prefHeight="530.0" prefWidth="827.0" stylesheets="@css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
+<HBox fx:id="rootHBox" prefHeight="530.0" prefWidth="784.0" stylesheets="@css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
    <children>
-      <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.47453516572352467" prefHeight="485.0" prefWidth="945.0">
+      <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.4688566552901024" prefHeight="485.0" prefWidth="945.0">
         <items>
             <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5494966442953021" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="333.0" prefWidth="364.0">
+                <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="360.0" prefHeight="333.0" prefWidth="364.0">
                      <children>
                         <Label fx:id="grammarTypeLabel" layoutX="14.0" layoutY="1.0" prefHeight="29.0" prefWidth="92.0" text="SLR">
                            <font>
@@ -49,15 +49,15 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0" style="-fx-background-color: #F1CE91;" />
               </items>
             </SplitPane>
-            <ScrollPane prefHeight="566.0" prefWidth="430.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="527.0" prefWidth="354.0">
                <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="429.0" style="-fx-background-color: #D26BC6;">
+                <AnchorPane fx:id="rightAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="610.0" prefWidth="455.0" style="-fx-background-color: #D26BC6;">
                      <children>
                         <TextField fx:id="inputStringTextField" layoutX="6.0" layoutY="7.0" promptText="输入串" />
                         <Button layoutX="197.0" layoutY="7.0" mnemonicParsing="false" onAction="#processInputString" text="分析" />
                         <Button fx:id="resumeButton" disable="true" layoutX="257.0" layoutY="7.0" mnemonicParsing="false" onAction="#resumeDebugger" text="继续" />
                         <Button fx:id="stepButton" disable="true" layoutX="319.0" layoutY="7.0" mnemonicParsing="false" onAction="#stepDebugger" text="向前一步" />
-                        <VBox layoutX="6.0" layoutY="41.0" prefHeight="359.0" prefWidth="422.0" spacing="3.0" styleClass="algorithm-vbox">
+                        <VBox layoutX="6.0" layoutY="41.0" prefHeight="359.0" prefWidth="443.0" spacing="3.0" styleClass="algorithm-vbox">
                            <children>
                               <Label text="令a为w#的第一个符号;&#10;while(1) { /*永远重复*/" wrapText="true">
                                  <VBox.margin>
@@ -73,7 +73,7 @@
                               <CheckBox mnemonicParsing="false" text="        令t为当前的栈顶状态;" />
                               <CheckBox mnemonicParsing="false" text="        将GOTO[t,A]压入栈中;" />
                               <CheckBox mnemonicParsing="false" text="        输出产生式A→β;" />
-                              <CheckBox mnemonicParsing="false" text="    } else if (ACTION[s,a]=接受) break; /*语法分析完成*/" />
+                              <CheckBox mnemonicParsing="false" prefHeight="23.0" prefWidth="476.0" text="    } else if (ACTION[s,a]=接受) break; /*语法分析完成*/" />
                               <CheckBox mnemonicParsing="false" text="    else error();" />
                               <Label text="}">
                                  <VBox.margin>
