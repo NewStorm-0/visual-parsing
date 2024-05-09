@@ -5,8 +5,6 @@ import com.chaldea.visualparsing.grammar.Expression;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.ProductionSymbol;
 import com.chaldea.visualparsing.grammar.Terminal;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
@@ -24,7 +22,7 @@ public class PredictiveParsingStepData {
     /**
      * 完整的输入符号
      */
-    private static List<Terminal> INPUT_SYMBOLS;
+    private static List<Terminal> inputSymbols;
 
     /**
      * 当前正在处理的符号的索引
@@ -32,7 +30,7 @@ public class PredictiveParsingStepData {
     private final int ip;
 
     /**
-     * 步骤
+     * 步骤序号
      */
     private final SimpleStringProperty number;
 
@@ -60,7 +58,8 @@ public class PredictiveParsingStepData {
             LoggerFactory.getLogger(PredictiveParsingStepData.class);
 
     public static void setInputSymbols(List<Terminal> inputSymbols) {
-        PredictiveParsingStepData.INPUT_SYMBOLS = new ArrayList<>(inputSymbols);
+        PredictiveParsingStepData.inputSymbols = new ArrayList<>(inputSymbols);
+        PredictiveParsingStepData.inputSymbols.add(Terminal.END_MARKER);
     }
 
     /**
@@ -98,8 +97,8 @@ public class PredictiveParsingStepData {
     }
 
     public StringProperty getInputQueue() {
-        List<Terminal> symbolList = INPUT_SYMBOLS.subList(ip,
-                INPUT_SYMBOLS.size() - 1);
+        List<Terminal> symbolList = inputSymbols.subList(ip,
+                inputSymbols.size());
         StringBuilder stringBuilder = new StringBuilder(32);
         for (ProductionSymbol symbol : symbolList) {
             stringBuilder.append(symbol.getValue());
