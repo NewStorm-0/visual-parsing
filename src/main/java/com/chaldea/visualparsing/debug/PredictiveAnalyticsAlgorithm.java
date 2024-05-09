@@ -38,9 +38,9 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
         predictiveTable = table;
         this.startSymbol = startSymbol;
         this.inputSymbols = new ArrayList<>(input);
+        this.inputSymbols.add(Terminal.END_MARKER);
         observers = new ArrayList<>();
         algorithmStepList = new ArrayList<>();
-        input.add(Terminal.END_MARKER);
         stack = new LinkedList<>();
         algorithmStepList.add(judgeXNotEqualsEndMarker());
         algorithmStepList.add(ifXEqualsIpSymbol());

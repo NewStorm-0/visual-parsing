@@ -188,8 +188,8 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
             return;
         }
         // 将输入字符串转换为Terminal的列表
-        List<Terminal> inputSymbolList =
-                convertStringToTerminalList(inputStringTextField.getText());
+        List<Terminal> inputSymbolList = Grammars
+                .convertStringToTerminalList(grammar, inputStringTextField.getText());
         algorithmDebugger.setStepwiseAlgorithm(new PredictiveAnalyticsAlgorithm(
                 parsingTable, grammar.getStartSymbol(), inputSymbolList
         ));
@@ -286,43 +286,6 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
         letXEqualsTopOfTheStack.setOnAction(event -> {
             algorithmDebugger.toggleBreakPoint(5);
         });
-    }
-
-    /**
-     * Convert string to terminal list.
-     * 将字符串转换为Terminal列表
-     *
-     * @param inputString the input string
-     * @return the list
-     */
-    private List<Terminal> convertStringToTerminalList(String inputString) {
-        StringBuilder regexRuleBuilder = new StringBuilder();
-        for (Terminal terminal : grammar.getTerminals()) {
-            regexRuleBuilder.append(escapeTerminalString(terminal)).append('|');
-        }
-        regexRuleBuilder.deleteCharAt(regexRuleBuilder.length() - 1);
-        logger.debug(regexRuleBuilder.toString());
-        Pattern pattern = Pattern.compile(regexRuleBuilder.toString());
-        Matcher matcher = pattern.matcher(inputString);
-        int lastEnd = 0;
-        List<Terminal> inputSymbolList = new ArrayList<>(inputString.length());
-        while (matcher.find()) {
-            int begin = matcher.start();
-            if (begin != lastEnd) {
-                DialogShower.showErrorDialog("存在无法识别的符号："
-                        + inputString.substring(lastEnd, begin));
-                throw new UnknownSymbolException();
-            }
-            int end = matcher.end();
-            inputSymbolList.add(grammar.getTerminal(inputString.substring(begin, end)));
-            lastEnd = end;
-        }
-        inputSymbolList.add(Terminal.END_MARKER);
-        return inputSymbolList;
-    }
-
-    private String escapeTerminalString(Terminal terminal) {
-        return Pattern.quote(terminal.getValue());
     }
 
 }

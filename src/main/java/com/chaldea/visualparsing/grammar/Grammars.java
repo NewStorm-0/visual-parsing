@@ -2,10 +2,13 @@ package com.chaldea.visualparsing.grammar;
 
 import com.chaldea.visualparsing.exception.grammar.ProductionNotFoundException;
 import com.chaldea.visualparsing.exception.grammar.UnknownSymbolException;
+import com.chaldea.visualparsing.gui.DialogShower;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Grammars {
@@ -308,6 +311,40 @@ public class Grammars {
     }
 
     /**
+     * Convert string to terminal list.
+     * 将字符串转换为Terminal列表
+     *
+     * @param grammar 文法对象
+     * @param inputString the input string
+     * @return the list
+     */
+    public static List<Terminal> convertStringToTerminalList(Grammar grammar,
+                                                             String inputString) {
+        StringBuilder regexRuleBuilder = new StringBuilder();
+        for (Terminal terminal : grammar.getTerminals()) {
+            regexRuleBuilder.append(escapeTerminalString(terminal)).append('|');
+        }
+        regexRuleBuilder.deleteCharAt(regexRuleBuilder.length() - 1);
+        logger.debug(regexRuleBuilder.toString());
+        Pattern pattern = Pattern.compile(regexRuleBuilder.toString());
+        Matcher matcher = pattern.matcher(inputString);
+        int lastEnd = 0;
+        List<Terminal> inputSymbolList = new ArrayList<>(inputString.length());
+        while (matcher.find()) {
+            int begin = matcher.start();
+            if (begin != lastEnd) {
+                DialogShower.showErrorDialog("存在无法识别的符号："
+                        + inputString.substring(lastEnd, begin));
+                throw new UnknownSymbolException();
+            }
+            int end = matcher.end();
+            inputSymbolList.add(grammar.getTerminal(inputString.substring(begin, end)));
+            lastEnd = end;
+        }
+        return inputSymbolList;
+    }
+
+    /**
      * Gets longest common prefix.获取最长公共前缀。调用getLongestCommonPrefixRunner方法
      *
      * @param production the production
@@ -448,6 +485,16 @@ public class Grammars {
             }
         }
         return true;
+    }
+
+    /**
+     * 将Terminal对象的value转换为正则表达式中的普通值，其中符号不会被当作特殊符号处理
+     *
+     * @param terminal the terminal
+     * @return the string
+     */
+    private static String escapeTerminalString(Terminal terminal) {
+        return Pattern.quote(terminal.getValue());
     }
 
     /**
