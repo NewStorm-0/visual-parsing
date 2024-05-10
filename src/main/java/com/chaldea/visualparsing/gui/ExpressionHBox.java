@@ -239,7 +239,7 @@ public class ExpressionHBox extends HBox {
     }
 
     /**
-     * 根据<>对字符串进行分割，并构造{@link com.chaldea.visualparsing.grammar.Expression}对象
+     * 根据&lt;&gt;对字符串进行分割，并构造{@link com.chaldea.visualparsing.grammar.Expression}对象
      *
      * @return Expression 对象
      * @throws EmptyExpressionException 产生式体为空异常
