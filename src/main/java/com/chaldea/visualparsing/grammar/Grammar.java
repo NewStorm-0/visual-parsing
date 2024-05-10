@@ -155,7 +155,7 @@ public class Grammar implements Serializable, Cloneable {
 
     /**
      * Convert string to expression.
-     * <p>对字符串进行解析，被<>括住的是一个文法符号，不被括住的，每一个字符视为一个文法符号</p>
+     * <p>对字符串进行解析，被&lt;&gt;括住的是一个文法符号，不被括住的，每一个字符视为一个文法符号</p>
      *
      * @param values the values
      * @return the expression
