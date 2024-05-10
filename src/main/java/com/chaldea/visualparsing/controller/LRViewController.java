@@ -2,12 +2,16 @@ package com.chaldea.visualparsing.controller;
 
 import com.chaldea.visualparsing.ArrayHelper;
 import com.chaldea.visualparsing.debug.LRParsingAlgorithm;
+import com.chaldea.visualparsing.debug.LRParsingObserver;
 import com.chaldea.visualparsing.debug.StepwiseAlgorithmDebugger;
 import com.chaldea.visualparsing.exception.LRConflictException;
+import com.chaldea.visualparsing.exception.LRParsingException;
 import com.chaldea.visualparsing.grammar.Grammar;
+import com.chaldea.visualparsing.grammar.Grammars;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.Terminal;
 import com.chaldea.visualparsing.gui.DialogShower;
+import com.chaldea.visualparsing.gui.LRParsingStepData;
 import com.chaldea.visualparsing.parsing.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -16,13 +20,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class LRViewController {
+public class LRViewController implements LRParsingObserver {
     @FXML
     private HBox rootHBox;
     @FXML
@@ -33,8 +38,6 @@ public class LRViewController {
     private Label grammarTypeLabel;
     @FXML
     private AnchorPane lrTableAnchorPane;
-    @FXML
-    private AnchorPane rightAnchorPane;
     @FXML
     private TextField inputStringTextField;
     @FXML
@@ -51,13 +54,28 @@ public class LRViewController {
      * 的添加表格数据和设置每列的显示</p>
      */
     @FXML
-    private TableView<Pair<Integer, ActionItem[]>> tableView;
+    private TableView<Pair<Integer, ActionItem[]>> parsingTableView;
     @FXML
     private TableColumn<Pair<Integer, ActionItem[]>, Integer> stateColumn;
     @FXML
     private TableColumn<Pair<Integer, ActionItem[]>, String> actionColumn;
     @FXML
     private TableColumn<Pair<Integer, ActionItem[]>, Integer> gotoColumn;
+
+    @FXML
+    private VBox algorithmVBox;
+    @FXML
+    private TableView<LRParsingStepData> stepDataTableView;
+    @FXML
+    private TableColumn<LRParsingStepData, Integer> numberColumn;
+    @FXML
+    private TableColumn<LRParsingStepData, String> stateStackColumn;
+    @FXML
+    private TableColumn<LRParsingStepData, String> symbolStackColumn;
+    @FXML
+    private TableColumn<LRParsingStepData, String> inputColumn;
+    @FXML
+    private TableColumn<LRParsingStepData, String> actionTakenColumn;
 
     private Grammar grammar;
     private LRParsingTable lrParsingTable;
@@ -67,7 +85,6 @@ public class LRViewController {
 
     public LRViewController() {
         algorithmDebugger = new StepwiseAlgorithmDebugger();
-        algorithmDebugger.setStepwiseAlgorithm(new LRParsingAlgorithm());
         ControllerMediator.getInstance().setLrViewController(this);
         logger.debug("已经注册LRViewController");
     }
@@ -75,6 +92,7 @@ public class LRViewController {
     @FXML
     private void initialize() {
         setStateColumnCellFactory();
+        setStepDataColumnsCellFactory();
         Platform.runLater(this::setLayout);
     }
 
@@ -83,8 +101,7 @@ public class LRViewController {
      */
     void setLRType(LRParsingTable.Type parsingTableType) {
         grammar = ControllerMediator.getInstance().getGrammar();
-        LRParsingAlgorithm lrParsingAlgorithm =
-                (LRParsingAlgorithm) algorithmDebugger.getStepwiseAlgorithm();
+        LRParsingStepData.setGrammar(grammar);
         try {
             switch (parsingTableType) {
                 case SLR:
@@ -107,13 +124,12 @@ public class LRViewController {
                     DialogShower.showErrorDialog("未知的LR类型" + parsingTableType);
                     break;
             }
+            setActionColumns();
+            setGotoColumns();
+            setTableViewDate();
         } catch (LRConflictException e) {
-            DialogShower.showErrorDialog("LR分析冲突");
+            DialogShower.showErrorDialog(grammarTypeLabel.getText() + "分析表构建冲突");
         }
-        lrParsingAlgorithm.setLrParsingTable(lrParsingTable);
-        setActionColumns();
-        setGotoColumns();
-        setTableViewDate();
     }
 
     @FXML
@@ -123,17 +139,36 @@ public class LRViewController {
 
     @FXML
     private void processInputString() {
-
+        if (inputStringTextField.getText().isBlank()) {
+            DialogShower.showErrorDialog("输入不能为空");
+            return;
+        }
+        // 清除原先的数据
+        stepDataTableView.getItems().clear();
+        // 将输入字符串转换为Terminal的列表
+        List<Terminal> inputSymbolList = Grammars
+                .convertStringToTerminalList(grammar, inputStringTextField.getText());
+        LRParsingAlgorithm algorithm = new LRParsingAlgorithm(
+                lrParsingTable, inputSymbolList
+        );
+        algorithm.addObserver(this);
+        algorithmDebugger.setStepwiseAlgorithm(algorithm);
+        LRParsingStepData.setInputSymbols(inputSymbolList);
+        // 设置 继续按钮、向前一步按钮 可点击
+        resumeButton.setDisable(false);
+        stepButton.setDisable(false);
+        // 开始执行debugger
+        algorithmDebugger.start();
     }
 
     @FXML
     private void resumeDebugger() {
-
+        algorithmDebugger.resume();
     }
 
     @FXML
     private void stepDebugger() {
-
+        algorithmDebugger.step();
     }
 
     /**
@@ -217,13 +252,60 @@ public class LRViewController {
             }
             dataCollection.add(new Pair<>(i, actionItems));
         }
-        tableView.getItems().clear();
-        tableView.getItems().addAll(dataCollection);
+        parsingTableView.getItems().clear();
+        parsingTableView.getItems().addAll(dataCollection);
     }
 
     private void setLayout() {
         horizontalSplitPane.prefWidthProperty().bind(rootHBox.widthProperty());
-        tableView.prefWidthProperty().bind(verticalSplitPane.widthProperty().subtract(25));
-        tableView.prefHeightProperty().bind(lrTableAnchorPane.heightProperty().subtract(40));
+        parsingTableView.prefWidthProperty().bind(verticalSplitPane.widthProperty().subtract(25));
+        parsingTableView.prefHeightProperty().bind(lrTableAnchorPane.heightProperty().subtract(40));
+    }
+
+    private void setStepDataColumnsCellFactory() {
+        numberColumn.setCellValueFactory(x -> x.getValue().getNumber());
+        stateStackColumn.setCellValueFactory(x -> x.getValue().getStateStack());
+        symbolStackColumn.setCellValueFactory(x -> x.getValue().getSymbolStack());
+        inputColumn.setCellValueFactory(x -> x.getValue().getInputSymbols());
+        actionTakenColumn.setCellValueFactory(x -> x.getValue().getAction());
+    }
+
+    @Override
+    public void addStepData(ActionItem actionItem) {
+        LRParsingAlgorithm algorithm =
+                (LRParsingAlgorithm) algorithmDebugger.getStepwiseAlgorithm();
+        LRParsingStepData stepData = new LRParsingStepData(
+                algorithm.getSymbolIndex(),
+                stepDataTableView.getItems().size() + 1,
+                algorithm.getStateStack(),
+                algorithm.getSymbolStack(),
+                actionItem
+        );
+        stepDataTableView.getItems().add(stepData);
+    }
+
+    @Override
+    public void showNextAlgorithmStep(int index) {
+        String styleClass = "next-statement";
+        algorithmVBox.getChildren().filtered(node -> node instanceof CheckBox)
+                .forEach(node -> node.getStyleClass().remove(styleClass));
+        int stepNumbers = (int) algorithmVBox.getChildren().stream()
+                .filter(node -> node instanceof CheckBox).count();
+        if (index == -1 || index >= stepNumbers) {
+            return;
+        }
+        algorithmVBox.getChildren().get(index + 1).getStyleClass().add(styleClass);
+    }
+
+    @Override
+    public void showException(Exception e) {
+        if (e instanceof LRParsingException e1) {
+            DialogShower.showErrorDialog("LR语法分析错误：" + e1.getMessage());
+        }
+    }
+
+    @Override
+    public void completeExecution() {
+        DialogShower.showInformationDialog("分析完毕");
     }
 }

@@ -32,7 +32,7 @@
                               <Font name="System Bold" size="22.0" />
                            </font>
                         </Label>
-                        <TableView fx:id="tableView" layoutX="13.0" layoutY="31.0" prefHeight="200.0" prefWidth="340.0">
+                        <TableView fx:id="parsingTableView" layoutX="13.0" layoutY="31.0" prefHeight="200.0" prefWidth="340.0">
                           <columns>
                             <TableColumn fx:id="stateColumn" prefWidth="75.0" text="状态" />
                             <TableColumn fx:id="actionColumn" prefWidth="169.3333511352539" text="ACTION" />
@@ -51,13 +51,13 @@
             </SplitPane>
             <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="527.0" prefWidth="354.0">
                <content>
-                <AnchorPane fx:id="rightAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="610.0" prefWidth="455.0" style="-fx-background-color: #D26BC6;">
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="610.0" prefWidth="455.0" style="-fx-background-color: #D26BC6;">
                      <children>
                         <TextField fx:id="inputStringTextField" layoutX="6.0" layoutY="7.0" promptText="输入串" />
                         <Button layoutX="197.0" layoutY="7.0" mnemonicParsing="false" onAction="#processInputString" text="分析" />
                         <Button fx:id="resumeButton" disable="true" layoutX="257.0" layoutY="7.0" mnemonicParsing="false" onAction="#resumeDebugger" text="继续" />
                         <Button fx:id="stepButton" disable="true" layoutX="319.0" layoutY="7.0" mnemonicParsing="false" onAction="#stepDebugger" text="向前一步" />
-                        <VBox layoutX="6.0" layoutY="41.0" prefHeight="359.0" prefWidth="443.0" spacing="3.0" styleClass="algorithm-vbox">
+                        <VBox fx:id="algorithmVBox" layoutX="6.0" layoutY="41.0" prefHeight="359.0" prefWidth="443.0" spacing="3.0" styleClass="algorithm-vbox">
                            <children>
                               <Label text="令a为w#的第一个符号;&#10;while(1) { /*永远重复*/" wrapText="true">
                                  <VBox.margin>
@@ -82,13 +82,13 @@
                               </Label>
                            </children>
                         </VBox>
-                        <TableView layoutX="6.0" layoutY="400.0" prefHeight="200.0" prefWidth="411.0">
+                        <TableView fx:id="stepDataTableView" layoutX="6.0" layoutY="400.0" prefHeight="200.0" prefWidth="411.0">
                           <columns>
-                            <TableColumn prefWidth="75.0" text="步骤" />
-                            <TableColumn prefWidth="75.0" text="栈" />
-                              <TableColumn prefWidth="75.0" text="符号" />
-                              <TableColumn prefWidth="75.0" text="输入" />
-                              <TableColumn prefWidth="75.0" text="动作" />
+                            <TableColumn fx:id="numberColumn" prefWidth="75.0" text="步骤" />
+                            <TableColumn fx:id="stateStackColumn" prefWidth="75.0" text="栈" />
+                              <TableColumn fx:id="symbolStackColumn" prefWidth="75.0" text="符号" />
+                              <TableColumn fx:id="inputColumn" prefWidth="75.0" text="输入" />
+                              <TableColumn fx:id="actionTakenColumn" prefWidth="75.0" text="动作" />
                           </columns>
                         </TableView>
                      </children>
