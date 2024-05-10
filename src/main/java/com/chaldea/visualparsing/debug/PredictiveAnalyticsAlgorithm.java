@@ -97,12 +97,12 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep ifXEqualsIpSymbol() {
         return parameters -> {
             if (X.equals(inputSymbols.get(ip))) {
-                stack.pop();
-                ip += 1;
-                currentStepIndex = algorithmStepList.size() - 1;
                 observers.forEach(observer ->
                         observer.addStepData(PredictiveAnalyticsObserver.MATCH,
                                 null, null));
+                stack.pop();
+                ip += 1;
+                currentStepIndex = algorithmStepList.size() - 1;
             }
             return null;
         };
@@ -139,6 +139,9 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             Expression expression = predictiveTable.get((Nonterminal) X,
                     inputSymbols.get(ip));
+            observers.forEach(observer ->
+                    observer.addStepData(PredictiveAnalyticsObserver.REPLACE,
+                            (Nonterminal) X, expression));
             stack.pop();
             ProductionSymbol[] body = expression.getValue();
             for (int i = body.length - 1; i >= 0; i--) {
@@ -147,9 +150,6 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
                 }
                 stack.push(body[i]);
             }
-            observers.forEach(observer ->
-                    observer.addStepData(PredictiveAnalyticsObserver.REPLACE,
-                            (Nonterminal) X, expression));
             return null;
         };
     }
