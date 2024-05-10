@@ -44,11 +44,11 @@
                      <content>
                         <TableView fx:id="stepView" prefHeight="146.0" prefWidth="459.0">
                           <columns>
-                            <TableColumn fx:id="numberColumn" editable="false" prefWidth="46.666687965393066" sortable="false" text="步骤" />
-                            <TableColumn fx:id="stackColumn" editable="false" prefWidth="82.66669082641602" sortable="false" text="分析栈" />
-                              <TableColumn fx:id="inputColumn" editable="false" prefWidth="97.3333740234375" sortable="false" text="输入队列" />
-                              <TableColumn fx:id="actionColumn" editable="false" prefWidth="75.0" sortable="false" text="动作" />
-                              <TableColumn fx:id="expressionColumn" editable="false" prefWidth="115.33331298828125" sortable="false" text="所用产生式" />
+                            <TableColumn fx:id="numberColumn" prefWidth="46.666687965393066" text="步骤" />
+                            <TableColumn fx:id="stackColumn" prefWidth="82.66669082641602" style="-fx-alignment: CENTER-LEFT;" text="分析栈" />
+                              <TableColumn fx:id="inputColumn" prefWidth="97.3333740234375" style="-fx-alignment: CENTER-RIGHT;" text="输入队列" />
+                              <TableColumn fx:id="actionColumn" prefWidth="75.0" text="动作" />
+                              <TableColumn fx:id="expressionColumn" prefWidth="115.33331298828125" text="所用产生式" />
                           </columns>
                         </TableView>
                      </content>
