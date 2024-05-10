@@ -190,11 +190,11 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
         // 将输入字符串转换为Terminal的列表
         List<Terminal> inputSymbolList = Grammars
                 .convertStringToTerminalList(grammar, inputStringTextField.getText());
-        algorithmDebugger.setStepwiseAlgorithm(new PredictiveAnalyticsAlgorithm(
+        PredictiveAnalyticsAlgorithm algorithm = new PredictiveAnalyticsAlgorithm(
                 parsingTable, grammar.getStartSymbol(), inputSymbolList
-        ));
-        ((PredictiveAnalyticsAlgorithm) algorithmDebugger.getStepwiseAlgorithm())
-                .addObserver(this);
+        );
+        algorithmDebugger.setStepwiseAlgorithm(algorithm);
+        algorithm.addObserver(this);
         PredictiveParsingStepData.setInputSymbols(inputSymbolList);
         // 清除原先的数据
         stepView.getItems().clear();

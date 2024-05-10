@@ -88,6 +88,7 @@ public class PredictiveParsingStepData {
 
     public StringProperty getStack() {
         StringBuilder stringBuilder = new StringBuilder(32);
+        // 如果不使用 backupStack，那么这个方法只有在第一次调用时会返回正确结果
         Deque<ProductionSymbol> backupStack = new LinkedList<>(parsingStack);
         while (!parsingStack.isEmpty()) {
             stringBuilder.append(parsingStack.removeLast().getValue());
