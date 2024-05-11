@@ -82,13 +82,13 @@
                               </Label>
                            </children>
                         </VBox>
-                        <TableView fx:id="stepDataTableView" layoutX="6.0" layoutY="400.0" prefHeight="200.0" prefWidth="411.0">
+                        <TableView fx:id="stepDataTableView" layoutX="6.0" layoutY="400.0" minHeight="125.0" prefHeight="200.0" prefWidth="441.0">
                           <columns>
-                            <TableColumn fx:id="numberColumn" editable="false" prefWidth="75.0" sortable="false" text="步骤" />
-                            <TableColumn fx:id="stateStackColumn" editable="false" prefWidth="75.0" sortable="false" text="栈" />
-                              <TableColumn fx:id="symbolStackColumn" editable="false" prefWidth="75.0" sortable="false" text="符号" />
-                              <TableColumn fx:id="inputColumn" editable="false" prefWidth="75.0" sortable="false" text="输入" />
-                              <TableColumn fx:id="actionTakenColumn" editable="false" prefWidth="75.0" sortable="false" text="动作" />
+                            <TableColumn fx:id="numberColumn" editable="false" prefWidth="49.999998569488525" sortable="false" text="步骤" />
+                            <TableColumn fx:id="stateStackColumn" editable="false" sortable="false" style="-fx-alignment: CENTER-LEFT;" text="栈" />
+                              <TableColumn fx:id="symbolStackColumn" editable="false" prefWidth="85.0" sortable="false" style="-fx-alignment: CENTER-LEFT;" text="符号" />
+                              <TableColumn fx:id="inputColumn" editable="false" prefWidth="100.0" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="输入" />
+                              <TableColumn fx:id="actionTakenColumn" editable="false" prefWidth="115.0" sortable="false" text="动作" />
                           </columns>
                         </TableView>
                      </children>

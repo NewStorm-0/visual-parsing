@@ -260,6 +260,9 @@ public class LRViewController implements LRParsingObserver {
         horizontalSplitPane.prefWidthProperty().bind(rootHBox.widthProperty());
         parsingTableView.prefWidthProperty().bind(verticalSplitPane.widthProperty().subtract(25));
         parsingTableView.prefHeightProperty().bind(lrTableAnchorPane.heightProperty().subtract(40));
+        stepDataTableView.prefHeightProperty().bind(horizontalSplitPane.heightProperty().subtract(405));
+        AnchorPane anchorPane = (AnchorPane) stepDataTableView.getParent();
+        stepDataTableView.prefWidthProperty().bind(anchorPane.widthProperty().subtract(14));
     }
 
     private void setStepDataColumnsCellFactory() {
