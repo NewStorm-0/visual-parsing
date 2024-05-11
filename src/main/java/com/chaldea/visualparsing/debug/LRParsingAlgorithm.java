@@ -131,7 +131,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep ifShift() {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state,(Terminal) symbol);
-            if (actionItem.action() != ActionItem.Action.SHIFT) {
+            if (actionItem == null || actionItem.action() != ActionItem.Action.SHIFT) {
                 currentStepIndex += 2;
                 return null;
             }
@@ -171,7 +171,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep elseIfReduce() {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state,(Terminal) symbol);
-            if (actionItem.action() != ActionItem.Action.REDUCE) {
+            if (actionItem == null || actionItem.action() != ActionItem.Action.REDUCE) {
                 currentStepIndex += 4;
                 return null;
             }
@@ -235,7 +235,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep elseIfAccept() {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state, (Terminal) symbol);
-            if (actionItem.action() == ActionItem.Action.ACCEPT) {
+            if (actionItem != null && actionItem.action() == ActionItem.Action.ACCEPT) {
                 observers.forEach(observer -> observer.addStepData(actionItem));
                 completeExecution();
                 observers.forEach(LRParsingObserver::completeExecution);
