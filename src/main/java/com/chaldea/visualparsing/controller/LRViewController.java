@@ -17,6 +17,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -43,7 +44,7 @@ public class LRViewController implements LRParsingObserver {
     @FXML
     private Button resumeButton;
     @FXML
-    private  Button stepButton;
+    private Button stepButton;
 
     /**
      * The Table view.
@@ -94,6 +95,7 @@ public class LRViewController implements LRParsingObserver {
         setStateColumnCellFactory();
         setStepDataColumnsCellFactory();
         Platform.runLater(this::setLayout);
+        bindCheckBoxOnAction();
     }
 
     /**
@@ -227,7 +229,7 @@ public class LRViewController implements LRParsingObserver {
         TableColumn<Pair<Integer, ActionItem[]>, Integer> temp =
                 new TableColumn<>(nonterminal.getValue());
         int index = ArrayHelper.findIndex(gotoColumnsHeader, nonterminal)
-                        + actionColumn.getColumns().size();
+                + actionColumn.getColumns().size();
         temp.setCellValueFactory(cellData -> {
             ActionItem actionItem = cellData.getValue().getValue()[index];
             return actionItem.number() == -1 ?
@@ -310,5 +312,19 @@ public class LRViewController implements LRParsingObserver {
     @Override
     public void completeExecution() {
         DialogShower.showInformationDialog("分析完毕");
+    }
+
+    /**
+     * 为checkbox伪代码行绑定处理断点事件
+     */
+    private void bindCheckBoxOnAction() {
+        int index = 0;
+        List<Node> nodes =
+                algorithmVBox.getChildren().filtered(n -> n instanceof CheckBox);
+        for (Node node : nodes) {
+            CheckBox checkBox = (CheckBox) node;
+            final int i = index++;
+            checkBox.setOnAction(event -> algorithmDebugger.toggleBreakPoint(i));
+        }
     }
 }

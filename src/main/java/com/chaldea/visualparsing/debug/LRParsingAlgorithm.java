@@ -79,12 +79,14 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         symbol = inputSymbols.get(0);
         stateStack.push(0);
         symbolIndex = 0;
+        observers.forEach(observer -> observer.showNextAlgorithmStep(0));
     }
 
     @Override
     public void executeStep() {
         lastStepReturnValue =
                 algorithmStepList.get(currentStepIndex++).execute(lastStepReturnValue);
+        observers.forEach(observer -> observer.showNextAlgorithmStep(currentStepIndex));
     }
 
     public void addObserver(LRParsingObserver observer) {
@@ -236,6 +238,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
             if (actionItem.action() == ActionItem.Action.ACCEPT) {
                 observers.forEach(observer -> observer.addStepData(actionItem));
                 completeExecution();
+                observers.forEach(LRParsingObserver::completeExecution);
             }
             return null;
         };
@@ -248,6 +251,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                     "]=" + (actionItem == null ? "NULL" : ActionItem.toString(actionItem));
             observers.forEach(observer ->
                     observer.showException(new LRParsingException(string)));
+            completeExecution();
             return null;
         };
     }
@@ -271,5 +275,6 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
 
     private void completeExecution() {
         currentStepIndex = algorithmStepList.size();
+        observers.forEach(observer -> observer.showNextAlgorithmStep(-1));
     }
 }
