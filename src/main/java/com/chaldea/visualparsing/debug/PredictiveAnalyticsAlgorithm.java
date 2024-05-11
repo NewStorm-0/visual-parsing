@@ -59,6 +59,9 @@ public class PredictiveAnalyticsAlgorithm extends StepwiseAlgorithm {
     }
 
     public void addObserver(PredictiveAnalyticsObserver observer) {
+        if (this.observers.contains(observer)) {
+            return;
+        }
         this.observers.add(observer);
     }
 

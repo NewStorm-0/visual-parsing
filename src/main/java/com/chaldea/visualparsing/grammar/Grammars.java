@@ -82,12 +82,12 @@ public class Grammars {
         int originalIndex = index;
         for (Production production : grammar.getProductions()) {
             int productionSize = production.getBody().size();
-            if (productionSize <= index) {
+            if (productionSize < index) {
                 index -= productionSize;
                 continue;
             }
             List<Expression> expressions = new ArrayList<>(1);
-            expressions.add(production.getBody().get(index));
+            expressions.add(production.getBody().get(index - 1));
             return new Production(production.getHead(), expressions);
         }
         throw new ProductionNotFoundException("未找到索引为" + originalIndex + "的表达式");

@@ -20,6 +20,7 @@ public class LR1Collection extends LRCollection {
         super(grammar);
         augmentedGrammar = Grammars.getAugmentedGrammar(grammar);
         setItems();
+        logger.debug("LR(1)项集：\n" + this);
     }
 
     public Grammar getAugmentedGrammar() {

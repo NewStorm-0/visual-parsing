@@ -138,7 +138,7 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
 
     @Override
     public void addStepData(String action, Nonterminal head, Expression expression) {
-        // 向预测预测表中添加一个步骤，并且高亮当前执行的步骤
+        // 向预测预测表中添加一个步骤
         PredictiveAnalyticsAlgorithm algorithm = (PredictiveAnalyticsAlgorithm)
                 algorithmDebugger.getStepwiseAlgorithm();
         PredictiveParsingStepData stepData = new PredictiveParsingStepData(
@@ -152,11 +152,11 @@ public class LL1ViewController implements PredictiveAnalyticsObserver {
     @Override
     public void showNextAlgorithmStep(int index) {
         String styleClass = "next-statement";
-        algorithmVBox.getChildren().forEach(node ->
-                node.getStyleClass().remove(styleClass));
-        int algorithmSize = (int) algorithmVBox.getChildren().stream()
+        algorithmVBox.getChildren().filtered(node -> node instanceof CheckBox)
+                .forEach(node -> node.getStyleClass().remove(styleClass));
+        int stepNumbers = (int) algorithmVBox.getChildren().stream()
                 .filter(node -> node instanceof CheckBox).count();
-        if (index == -1 || index >= algorithmSize) {
+        if (index == -1 || index >= stepNumbers) {
             return;
         }
         algorithmVBox.getChildren().get(index + 2).getStyleClass().add(styleClass);

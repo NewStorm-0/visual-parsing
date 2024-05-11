@@ -1,15 +1,11 @@
 package com.chaldea.visualparsing.debug;
 
-import com.chaldea.visualparsing.exception.BaseException;
 import com.chaldea.visualparsing.exception.LRParsingException;
 import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.parsing.ActionItem;
 import com.chaldea.visualparsing.parsing.LRParsingTable;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The type Lr parsing algorithm.LR语法分析算法
@@ -21,27 +17,43 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private final Deque<ProductionSymbol> symbolStack;
     private List<Terminal> inputSymbols;
     private int state;
-    private ProductionSymbol symbol;
-    private int symbolIndex;
 
     /**
-     * Instantiates a new Lr parsing algorithm.
-     * 需要在后续设置lrParsingTable和input
+     * 当前处理的符号
      */
-    public LRParsingAlgorithm() {
+    private ProductionSymbol symbol;
+
+    /**
+     * symbol 在输入串中的索引
+     */
+    private int symbolIndex;
+
+    private final List<LRParsingObserver> observers;
+
+    private LRParsingAlgorithm() {
+        observers = new ArrayList<>();
         algorithmStepList = new ArrayList<>();
         stateStack = new LinkedList<>();
         symbolStack = new LinkedList<>();
         algorithmStepList.add(letSIsThsStateOfTop());
         algorithmStepList.add(ifShift());
-        algorithmStepList.add(pushTOntoStackAndChangeSymbol());
+        algorithmStepList.add(pushTOntoStack());
+        algorithmStepList.add(letABeTheNextInputSymbol());
         algorithmStepList.add(elseIfReduce());
-        algorithmStepList.add(popSymbolFromStackAndSetT());
-        algorithmStepList.add(pushGoOntoStackAndOutputProduction());
+        algorithmStepList.add(popSymbolFromStack());
+        algorithmStepList.add(letTBeTheStateOfTheTopOfTheStack());
+        algorithmStepList.add(pushGoOntoStack());
+        algorithmStepList.add(outputProduction());
         algorithmStepList.add(elseIfAccept());
         algorithmStepList.add(elseErrorRecovery());
     }
 
+    /**
+     * Instantiates a new Lr parsing algorithm.
+     *
+     * @param lrParsingTable LR语法分析表
+     * @param input          输入符号
+     */
     public LRParsingAlgorithm(LRParsingTable lrParsingTable, List<Terminal> input) {
         this();
         setLrParsingTable(lrParsingTable);
@@ -75,6 +87,24 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 algorithmStepList.get(currentStepIndex++).execute(lastStepReturnValue);
     }
 
+    public void addObserver(LRParsingObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    public int getSymbolIndex() {
+        return symbolIndex;
+    }
+
+    public Deque<Integer> getStateStack() {
+        return new ArrayDeque<>(stateStack);
+    }
+
+    public Deque<ProductionSymbol> getSymbolStack() {
+        return new ArrayDeque<>(symbolStack);
+    }
+
     /**
      * Let s is ths state of top algorithm step. 令s是栈顶的状态
      *
@@ -103,14 +133,32 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 currentStepIndex += 2;
                 return null;
             }
+            observers.forEach(observer -> observer.addStepData(actionItem));
             return new Object[] {actionItem.number()};
         };
     }
 
-    private AlgorithmStep pushTOntoStackAndChangeSymbol() {
+    /**
+     * Push t onto stack algorithm step.
+     * 将t压入栈中
+     *
+     * @return the algorithm step
+     */
+    private AlgorithmStep pushTOntoStack() {
         return parameters -> {
             int t = (Integer) parameters[0];
             stateStack.push(t);
+            return null;
+        };
+    }
+
+    /**
+     * 令a为下一个输入符号
+     *
+     * @return the algorithm step
+     */
+    private AlgorithmStep letABeTheNextInputSymbol() {
+        return parameters -> {
             symbolStack.push(symbol);
             toNextSymbol();
             currentStepIndex = 0;
@@ -122,14 +170,15 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state,(Terminal) symbol);
             if (actionItem.action() != ActionItem.Action.REDUCE) {
-                currentStepIndex += 3;
+                currentStepIndex += 4;
                 return null;
             }
+            observers.forEach(observer -> observer.addStepData(actionItem));
             return new Object[] {actionItem};
         };
     }
 
-    private AlgorithmStep popSymbolFromStackAndSetT() {
+    private AlgorithmStep popSymbolFromStack() {
         return parameters -> {
             int expressionIndex = ((ActionItem) parameters[0]).number();
             Production production =
@@ -142,7 +191,19 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         };
     }
 
-    private AlgorithmStep pushGoOntoStackAndOutputProduction() {
+
+    /**
+     * 令t为当前的栈顶状态
+     * <p>在下一个步骤中，可以直接获得栈顶的状态，所以此步无需任何动作</p>
+     * @return the algorithm step
+     */
+    private AlgorithmStep letTBeTheStateOfTheTopOfTheStack() {
+        return parameters -> {
+            return parameters;
+        };
+    }
+
+    private AlgorithmStep pushGoOntoStack() {
         return parameters -> {
             if (stateStack.isEmpty()) {
                 throw new LRParsingException("stateStack为空");
@@ -151,6 +212,19 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
             int newState = lrParsingTable.go(stateStack.peek(), production.getHead());
             stateStack.push(newState);
             symbolStack.push(production.getHead());
+            return parameters;
+        };
+    }
+
+    /**
+     * 输出产生式A→β
+     *
+     * @return the algorithm step
+     */
+    private AlgorithmStep outputProduction() {
+        return parameters -> {
+            Production production = (Production) parameters[0];
+
             currentStepIndex = 0;
             return null;
         };
@@ -160,6 +234,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state, (Terminal) symbol);
             if (actionItem.action() == ActionItem.Action.ACCEPT) {
+                observers.forEach(observer -> observer.addStepData(actionItem));
                 completeExecution();
             }
             return null;
@@ -168,7 +243,12 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
 
     private AlgorithmStep elseErrorRecovery() {
         return parameters -> {
-            throw new LRParsingException();
+            ActionItem actionItem = lrParsingTable.action(state, (Terminal) symbol);
+            String string = "ACTION[" + stateStack.peek() + "," + symbol.getValue() +
+                    "]=" + (actionItem == null ? "NULL" : ActionItem.toString(actionItem));
+            observers.forEach(observer ->
+                    observer.showException(new LRParsingException(string)));
+            return null;
         };
     }
 
