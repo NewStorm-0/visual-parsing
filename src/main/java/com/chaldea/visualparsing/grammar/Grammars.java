@@ -341,6 +341,11 @@ public class Grammars {
             inputSymbolList.add(grammar.getTerminal(inputString.substring(begin, end)));
             lastEnd = end;
         }
+        if (lastEnd != inputString.length()) {
+            DialogShower.showErrorDialog("存在无法识别的符号" +
+                    inputString.substring(lastEnd));
+            throw new UnknownSymbolException();
+        }
         return inputSymbolList;
     }
 
