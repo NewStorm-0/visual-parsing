@@ -319,6 +319,7 @@ public class LRViewController implements LRParsingObserver {
     @Override
     public void completeExecution() {
         DialogShower.showInformationDialog("分析完毕");
+        executeJavaScript("recalculateLevel()");
     }
 
     @Override

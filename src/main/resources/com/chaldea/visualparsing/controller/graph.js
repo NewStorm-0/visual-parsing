@@ -7,23 +7,31 @@ const treeData = {
     nodes: treeNodes,
     edges: treeEdges
 };
-let options = {
+let treeOptions = {
     layout: {
         improvedLayout: true,
         hierarchical: {
             enabled: true,
-            levelSeparation: 80,
-            nodeSpacing: 50,
-            treeSpacing: 80,
+            levelSeparation: 150,
+            nodeSpacing: 100,
+            treeSpacing: 100,
             direction: 'UD',
-            sortMethod: 'hubsize',
-            shakeTowards: "roots"
+            sortMethod: 'hubsize'
         }
+    },
+    nodes: {
+        borderWidthSelected: 2.5,
+        font: {
+            size: 40
+        }
+    },
+    edges: {
+        width: 5,
     }
 };
 
 const symbolNumberMap = new Map();
-const treeNodeIdStack = [];
+const treeNodeStack = [];
 
 /**
  * 向语法分析树中加一个节点
@@ -39,8 +47,8 @@ function addNodeToTree(symbolValue) {
         symbolNumberMap.set(symbolValue, 2);
         value = symbolValue + '1';
     }
-    treeNodes.add({id: value, label: symbolValue});
-    treeNodeIdStack.push(value);
+    treeNodes.add({id: value, label: symbolValue, level: 0});
+    treeNodeStack.push(treeNodes.get(value));
     return value;
 }
 
@@ -51,15 +59,72 @@ function addNodeToTree(symbolValue) {
  */
 function addParentNodeToTree(parent, ...children) {
     const childrenNodes = [];
+    let minLevel = 0;
     for (const childrenNode of children) {
-        childrenNodes.push(treeNodeIdStack.pop());
+        const temp = treeNodeStack.pop()
+        childrenNodes.push(temp);
+        minLevel = Math.min(minLevel, temp.level)
     }
     let parentNodeId = addNodeToTree(parent);
+    // 更新父节点的level
+    const temp = treeNodes.get(parentNodeId);
+    temp.level = minLevel - 1;
+    treeNodes.update(temp);
+
     for (const childrenNode of childrenNodes) {
-        treeEdges.add({from: childrenNode, to: parentNodeId});
+        // 此处添加的边用于记录父子关系
+        treeEdges.add({from: parentNodeId, to: childrenNode.id});
     }
 }
 
+/**
+ * 从根节点开始计算level，使树更美丽
+ */
+function recalculateLevel() {
+    const root = treeNodeStack.pop();
+    _recalculateLevel(root);
+    // 刷新边的布局
+    treeNetwork.setOptions(treeOptions);
+}
+
+function _recalculateLevel(root) {
+    const childrenId = findChildrenNodes(root.id, treeEdges);
+    for (const childId of childrenId) {
+        const childNode = treeNodes.get(childId);
+        childNode.level = root.level + 1;
+        treeNodes.update(childNode);
+        // // 先删除原先的边
+        // const edgeIdToDelete = edges.get({
+        //     filter: function (item) {
+        //         return item.from === root.id && item.to === childNode.id;
+        //     }
+        // });
+        // if (edgeIdToDelete.length > 0) {
+        //     edges.remove(edgeIdToDelete[0].id);
+        // }
+        // // 再添加新的边
+        // treeEdges.add({from: root.id, to: childNode.id});
+        _recalculateLevel(childNode);
+    }
+}
+
+/**
+ * 获取一个节点的所有子节点的id
+ * @param nodeId
+ * @param edges 边的dataset
+ * @returns {*[]}
+ */
+function findChildrenNodes(nodeId, edges) {
+    let childrenId = [];
+    // 遍历所有边以找到子节点
+    edges.forEach((edge) => {
+        if(edge.from === nodeId) {
+            childrenId.push(edge.to);
+        }
+    });
+    return childrenId;
+}
+
 const parseTreeContainer = document.getElementById('parse-tree');
-const treeNetwork = new vis.Network(parseTreeContainer, treeData, options);
-treeNetwork.setOptions(options);
+const treeNetwork = new vis.Network(parseTreeContainer, treeData, treeOptions);
+treeNetwork.setOptions(treeOptions);
