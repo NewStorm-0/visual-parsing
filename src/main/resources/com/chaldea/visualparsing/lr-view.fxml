@@ -13,12 +13,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
 
 <HBox fx:id="rootHBox" prefHeight="530.0" prefWidth="784.0" stylesheets="@css/default1.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chaldea.visualparsing.controller.LRViewController">
    <children>
       <SplitPane fx:id="horizontalSplitPane" dividerPositions="0.4688566552901024" prefHeight="485.0" prefWidth="945.0">
         <items>
-            <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5494966442953021" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+            <SplitPane fx:id="verticalSplitPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
                 <AnchorPane fx:id="lrTableAnchorPane" minHeight="0.0" minWidth="360.0" prefHeight="333.0" prefWidth="364.0">
                      <children>
@@ -46,7 +47,7 @@
                         </Button>
                      </children>
                   </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0" style="-fx-background-color: #F1CE91;" />
+                  <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />
               </items>
             </SplitPane>
             <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="527.0" prefWidth="354.0">

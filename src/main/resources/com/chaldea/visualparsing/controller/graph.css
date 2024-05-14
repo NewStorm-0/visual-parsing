@@ -1,0 +1,12 @@
+#container {
+    display: flex;
+}
+
+#parser-state {
+    border-right: 2px solid gray;
+    height: calc(100vh - 16pt);
+}
+
+#parse-tree {
+    height: calc(100vh - 16pt);
+}
