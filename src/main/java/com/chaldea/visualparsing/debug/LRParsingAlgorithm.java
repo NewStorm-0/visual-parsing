@@ -190,6 +190,10 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
             int expressionIndex = ((ActionItem) parameters[0]).number();
             Production production =
                     Grammars.getExpression(lrParsingTable.getGrammar(), expressionIndex);
+            // 判断产生式体是否为ε
+            if (Terminal.EMPTY_STRING.equals(production.getBody().get(0).get(0))) {
+                return new Object[]{production};
+            }
             for (int i = 0; i < production.getBody().get(0).length(); ++i) {
                 symbolStack.pop();
                 stateStack.pop();
@@ -235,6 +239,11 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep outputProduction() {
         return parameters -> {
             Production production = (Production) parameters[0];
+            // 判断产生式体是否为ε
+            if (Terminal.EMPTY_STRING.equals(production.getBody().get(0).get(0))) {
+                observers.forEach(observer ->
+                        observer.addNodeToTree(Terminal.EMPTY_STRING));
+            }
             observers.forEach(observer -> observer.addParentNodeToTree(production.getHead(),
                     production.getBody().get(0).getValue()));
             currentStepIndex = 0;

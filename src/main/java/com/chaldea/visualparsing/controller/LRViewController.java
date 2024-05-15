@@ -136,6 +136,7 @@ public class LRViewController implements LRParsingObserver {
             setGotoColumns();
             setTableViewDate();
         } catch (LRConflictException e) {
+            logger.error(e.toString());
             DialogShower.showErrorDialog(grammarTypeLabel.getText() + "分析表构建冲突");
         }
     }
@@ -324,16 +325,16 @@ public class LRViewController implements LRParsingObserver {
 
     @Override
     public void addNodeToTree(Terminal terminal) {
-        executeJavaScript("addNodeToTree('" + terminal.getValue() + "');");
+        executeJavaScript("addNodeToTree('" + escapeString(terminal.getValue()) + "');");
     }
 
     @Override
     public void addParentNodeToTree(Nonterminal nonterminal, ProductionSymbol... symbols) {
         StringBuilder script = new StringBuilder();
-        script.append("addParentNodeToTree('").append(nonterminal.getValue())
+        script.append("addParentNodeToTree('").append(escapeString(nonterminal.getValue()))
                 .append("'");
         for (ProductionSymbol symbol : symbols) {
-            script.append(", '").append(symbol.getValue()).append("'");
+            script.append(", '").append(escapeString(symbol.getValue())).append("'");
         }
         script.append(");");
         executeJavaScript(script.toString());
@@ -346,8 +347,8 @@ public class LRViewController implements LRParsingObserver {
 
     @Override
     public void addNodeToState(String state, ProductionSymbol symbol) {
-        executeJavaScript("addNodeToState('" + state + "', '" + symbol.getValue()
-                + "');");
+        executeJavaScript("addNodeToState('" + state + "', '" +
+                escapeString(symbol.getValue()) + "');");
     }
 
     @Override
@@ -412,5 +413,23 @@ public class LRViewController implements LRParsingObserver {
         };
         // 添加监听器等待页面加载完成
         webEngine.getLoadWorker().stateProperty().addListener(listener);
+    }
+
+    /**
+     * Escape string string.对字符串进行转义。
+     * <p>转义其中的'与"及其它特殊符号</p>
+     *
+     * @param string the string
+     * @return the string
+     */
+    private String escapeString(String string) {
+        return string.replace("\\", "\\\\")
+                .replace("'", "\\'")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f");
     }
 }

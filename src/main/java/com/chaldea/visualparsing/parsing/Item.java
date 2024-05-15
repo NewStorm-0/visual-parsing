@@ -4,6 +4,7 @@ import com.chaldea.visualparsing.exception.IllegalItemPointException;
 import com.chaldea.visualparsing.grammar.Expression;
 import com.chaldea.visualparsing.grammar.Nonterminal;
 import com.chaldea.visualparsing.grammar.ProductionSymbol;
+import com.chaldea.visualparsing.grammar.Terminal;
 
 import java.util.Objects;
 
@@ -53,6 +54,9 @@ public class Item {
      */
     public ProductionSymbol getCurrentSymbol() {
         if (point == expression.length()) {
+            return null;
+        }
+        if (expression.get(0).equals(Terminal.EMPTY_STRING)) {
             return null;
         }
         return expression.get(point);

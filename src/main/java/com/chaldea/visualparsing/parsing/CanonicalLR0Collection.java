@@ -178,11 +178,11 @@ public class CanonicalLR0Collection extends LRCollection {
     }
 
     /**
-     * Add new items to closure item set.
+     * 将根据item得到的项加入到closureSet和newAddedItemSet中
      *
      * @param item            the item which is based on
      * @param closureSet      the closure set
-     * @param newAddedItemSet the new added item set
+     * @param newAddedItemSet 记录成功加入的项
      */
     private void addItemsBasedOnItem(Item item, ItemSet closureSet,
                                      ItemSet newAddedItemSet) {
