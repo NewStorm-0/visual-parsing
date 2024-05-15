@@ -6,22 +6,24 @@ import com.chaldea.visualparsing.debug.LRParsingObserver;
 import com.chaldea.visualparsing.debug.StepwiseAlgorithmDebugger;
 import com.chaldea.visualparsing.exception.LRConflictException;
 import com.chaldea.visualparsing.exception.LRParsingException;
-import com.chaldea.visualparsing.grammar.Grammar;
-import com.chaldea.visualparsing.grammar.Grammars;
-import com.chaldea.visualparsing.grammar.Nonterminal;
-import com.chaldea.visualparsing.grammar.Terminal;
+import com.chaldea.visualparsing.grammar.*;
 import com.chaldea.visualparsing.gui.DialogShower;
 import com.chaldea.visualparsing.gui.LRParsingStepData;
 import com.chaldea.visualparsing.parsing.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +80,9 @@ public class LRViewController implements LRParsingObserver {
     @FXML
     private TableColumn<LRParsingStepData, String> actionTakenColumn;
 
+    @FXML
+    private WebView webView;
+
     private Grammar grammar;
     private LRParsingTable lrParsingTable;
     private final StepwiseAlgorithmDebugger algorithmDebugger;
@@ -96,6 +101,7 @@ public class LRViewController implements LRParsingObserver {
         setStepDataColumnsCellFactory();
         Platform.runLater(this::setLayout);
         bindCheckBoxOnAction();
+        initializeWebView();
     }
 
     /**
@@ -146,6 +152,7 @@ public class LRViewController implements LRParsingObserver {
             return;
         }
         // 清除原先的数据
+        resetWebView();
         stepDataTableView.getItems().clear();
         // 将输入字符串转换为Terminal的列表
         List<Terminal> inputSymbolList = Grammars
@@ -312,6 +319,41 @@ public class LRViewController implements LRParsingObserver {
     @Override
     public void completeExecution() {
         DialogShower.showInformationDialog("分析完毕");
+        executeJavaScript("recalculateLevel()");
+    }
+
+    @Override
+    public void addNodeToTree(Terminal terminal) {
+        executeJavaScript("addNodeToTree('" + terminal.getValue() + "');");
+    }
+
+    @Override
+    public void addParentNodeToTree(Nonterminal nonterminal, ProductionSymbol... symbols) {
+        StringBuilder script = new StringBuilder();
+        script.append("addParentNodeToTree('").append(nonterminal.getValue())
+                .append("'");
+        for (ProductionSymbol symbol : symbols) {
+            script.append(", '").append(symbol.getValue()).append("'");
+        }
+        script.append(");");
+        executeJavaScript(script.toString());
+    }
+
+    @Override
+    public void initializeParserState(int state) {
+        executeJavaScript("initializeParserStateNode('" + state + "');");
+    }
+
+    @Override
+    public void addNodeToState(String state, ProductionSymbol symbol) {
+        executeJavaScript("addNodeToState('" + state + "', '" + symbol.getValue()
+                + "');");
+    }
+
+    @Override
+    public void rollbackState(Production production) {
+        executeJavaScript("rollbackState("
+                + production.getBody().get(0).getValue().length + ");");
     }
 
     /**
@@ -326,5 +368,49 @@ public class LRViewController implements LRParsingObserver {
             final int i = index++;
             checkBox.setOnAction(event -> algorithmDebugger.toggleBreakPoint(i));
         }
+    }
+
+    private void initializeWebView() {
+        webView.getEngine().load(Objects.requireNonNull(getClass().getResource("graph.html")).toExternalForm());
+    }
+
+    /**
+     * 清除现有节点图及语法翻译器状态显示
+     */
+    private void resetWebView() {
+        webView.getEngine().reload();
+    }
+
+    /**
+     * Execute java script.
+     * <p>该方法能否保证script的执行顺序目前是不得而知的</p>
+     *
+     * @param script the script
+     */
+    private void executeJavaScript(String script) {
+        WebEngine webEngine = webView.getEngine();
+        // 如果页面已经加载完成
+        if (webEngine.getLoadWorker().getState() == javafx.concurrent.Worker.State.SUCCEEDED) {
+            // 直接执行脚本
+            logger.debug("执行js：{}", script);
+            webEngine.executeScript(script);
+            return;
+        }
+        // 否则等待页面加载完成后执行脚本
+        // 创建一个ChangeListener
+        ChangeListener<Worker.State> listener = new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends Worker.State> observable, javafx.concurrent.Worker.State oldValue, javafx.concurrent.Worker.State newState) {
+                if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    logger.debug("执行js：{}", script);
+                    // 页面加载成功后执行的脚本
+                    webEngine.executeScript(script);
+                    // 执行完毕后移除监听器
+                    observable.removeListener(this);
+                }
+            }
+        };
+        // 添加监听器等待页面加载完成
+        webEngine.getLoadWorker().stateProperty().addListener(listener);
     }
 }

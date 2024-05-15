@@ -21,7 +21,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     /**
      * 当前处理的符号
      */
-    private ProductionSymbol symbol;
+    private Terminal symbol;
 
     /**
      * symbol 在输入串中的索引
@@ -79,7 +79,10 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         symbol = inputSymbols.get(0);
         stateStack.push(0);
         symbolIndex = 0;
-        observers.forEach(observer -> observer.showNextAlgorithmStep(0));
+        observers.forEach(observer -> {
+            observer.showNextAlgorithmStep(0);
+            observer.initializeParserState(0);
+        });
     }
 
     @Override
@@ -130,13 +133,13 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
      */
     private AlgorithmStep ifShift() {
         return parameters -> {
-            ActionItem actionItem = lrParsingTable.action(state,(Terminal) symbol);
+            ActionItem actionItem = lrParsingTable.action(state, symbol);
             if (actionItem == null || actionItem.action() != ActionItem.Action.SHIFT) {
                 currentStepIndex += 2;
                 return null;
             }
             observers.forEach(observer -> observer.addStepData(actionItem));
-            return new Object[] {actionItem.number()};
+            return new Object[]{actionItem.number()};
         };
     }
 
@@ -150,6 +153,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             int t = (Integer) parameters[0];
             stateStack.push(t);
+            observers.forEach(observer -> observer.addNodeToState(String.valueOf(t),
+                    symbol));
             return null;
         };
     }
@@ -170,13 +175,13 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
 
     private AlgorithmStep elseIfReduce() {
         return parameters -> {
-            ActionItem actionItem = lrParsingTable.action(state,(Terminal) symbol);
+            ActionItem actionItem = lrParsingTable.action(state, symbol);
             if (actionItem == null || actionItem.action() != ActionItem.Action.REDUCE) {
                 currentStepIndex += 4;
                 return null;
             }
             observers.forEach(observer -> observer.addStepData(actionItem));
-            return new Object[] {actionItem};
+            return new Object[]{actionItem};
         };
     }
 
@@ -189,7 +194,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 symbolStack.pop();
                 stateStack.pop();
             }
-            return new Object[] {production};
+            observers.forEach(observer -> observer.rollbackState(production));
+            return new Object[]{production};
         };
     }
 
@@ -197,6 +203,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     /**
      * 令t为当前的栈顶状态
      * <p>在下一个步骤中，可以直接获得栈顶的状态，所以此步无需任何动作</p>
+     *
      * @return the algorithm step
      */
     private AlgorithmStep letTBeTheStateOfTheTopOfTheStack() {
@@ -214,6 +221,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
             int newState = lrParsingTable.go(stateStack.peek(), production.getHead());
             stateStack.push(newState);
             symbolStack.push(production.getHead());
+            observers.forEach(observer ->
+                    observer.addNodeToState(String.valueOf(newState), production.getHead()));
             return parameters;
         };
     }
@@ -226,7 +235,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     private AlgorithmStep outputProduction() {
         return parameters -> {
             Production production = (Production) parameters[0];
-
+            observers.forEach(observer -> observer.addParentNodeToTree(production.getHead(),
+                    production.getBody().get(0).getValue()));
             currentStepIndex = 0;
             return null;
         };
@@ -234,11 +244,14 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
 
     private AlgorithmStep elseIfAccept() {
         return parameters -> {
-            ActionItem actionItem = lrParsingTable.action(state, (Terminal) symbol);
+            ActionItem actionItem = lrParsingTable.action(state, symbol);
             if (actionItem != null && actionItem.action() == ActionItem.Action.ACCEPT) {
-                observers.forEach(observer -> observer.addStepData(actionItem));
+                observers.forEach(observer -> {
+                    observer.addStepData(actionItem);
+                    observer.completeExecution();
+                    observer.addNodeToState("accept", symbol);
+                });
                 completeExecution();
-                observers.forEach(LRParsingObserver::completeExecution);
             }
             return null;
         };
@@ -246,7 +259,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
 
     private AlgorithmStep elseErrorRecovery() {
         return parameters -> {
-            ActionItem actionItem = lrParsingTable.action(state, (Terminal) symbol);
+            ActionItem actionItem = lrParsingTable.action(state, symbol);
             String string = "ACTION[" + stateStack.peek() + "," + symbol.getValue() +
                     "]=" + (actionItem == null ? "NULL" : ActionItem.toString(actionItem));
             observers.forEach(observer ->
@@ -270,6 +283,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
      * To next symbol.
      */
     private void toNextSymbol() {
+        observers.forEach(observer -> observer.addNodeToTree(symbol));
         changeSymbol(symbolIndex + 1);
     }
 

@@ -1,0 +1,16 @@
+#container {
+    display: flex;
+}
+
+#parser-state {
+    border-right: 2px solid gray;
+    height: calc(100vh - 30pt);
+    min-width: 200pt;
+    min-height: 200pt;
+}
+
+#parse-tree {
+    height: calc(100vh - 30pt);
+    min-width: 200pt;
+    min-height: 200pt;
+}

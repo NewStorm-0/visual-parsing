@@ -1,6 +1,7 @@
 module com.chaldea.visualparsing {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.web;
     requires org.controlsfx.controls;
     requires org.slf4j;
 
