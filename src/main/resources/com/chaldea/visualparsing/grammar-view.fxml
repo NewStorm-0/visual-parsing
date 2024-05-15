@@ -6,7 +6,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -28,54 +27,6 @@
               <ScrollPane fx:id="grammarScrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" prefHeight="318.0" prefWidth="572.0">
                <content>
                       <VBox fx:id="scrollVBox" prefHeight="325.0" prefWidth="305.0" spacing="10.0">
-                          <children>
-                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0" style="-fx-background-color: pink;">
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="1234567890987654321234567890">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></TextField>
-                                  <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
-                                      <font>
-                                          <Font name="System Bold" size="20.0" />
-                                      </font>
-                                  </Label>
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="81.0" text="ADC">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></TextField>
-                                  <Button mnemonicParsing="false" text="编辑">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></Button>
-                                  <Button mnemonicParsing="false" text="删除">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></Button>
-                              </HBox>
-                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="59.0" text="E">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></TextField>
-                                  <Label scaleX="2.0" scaleY="1.2" text="➡" textFill="lawngreen">
-                                      <font>
-                                          <Font name="System Bold" size="20.0" />
-                                      </font>
-                                  </Label>
-                                  <TextField editable="false" prefHeight="29.0" prefWidth="82.0" text="ADC">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></TextField>
-                                  <Button mnemonicParsing="false" text="编辑">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></Button>
-                                  <Button mnemonicParsing="false" text="删除">
-                              <font>
-                                 <Font size="20.0" />
-                              </font></Button>
-                              </HBox>
-                          </children>
                           <padding>
                               <Insets left="5.0" top="5.0" />
                           </padding>
