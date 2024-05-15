@@ -339,6 +339,23 @@ public class LRViewController implements LRParsingObserver {
         executeJavaScript(script.toString());
     }
 
+    @Override
+    public void initializeParserState(int state) {
+        executeJavaScript("initializeParserStateNode('" + state + "');");
+    }
+
+    @Override
+    public void addNodeToState(String state, ProductionSymbol symbol) {
+        executeJavaScript("addNodeToState('" + state + "', '" + symbol.getValue()
+                + "');");
+    }
+
+    @Override
+    public void rollbackState(Production production) {
+        executeJavaScript("rollbackState("
+                + production.getBody().get(0).getValue().length + ");");
+    }
+
     /**
      * 为checkbox伪代码行绑定处理断点事件
      */
@@ -371,11 +388,11 @@ public class LRViewController implements LRParsingObserver {
      * @param script the script
      */
     private void executeJavaScript(String script) {
-        logger.debug("执行js：{}", script);
         WebEngine webEngine = webView.getEngine();
         // 如果页面已经加载完成
         if (webEngine.getLoadWorker().getState() == javafx.concurrent.Worker.State.SUCCEEDED) {
             // 直接执行脚本
+            logger.debug("执行js：{}", script);
             webEngine.executeScript(script);
             return;
         }
@@ -385,6 +402,7 @@ public class LRViewController implements LRParsingObserver {
             @Override
             public void changed(ObservableValue<? extends Worker.State> observable, javafx.concurrent.Worker.State oldValue, javafx.concurrent.Worker.State newState) {
                 if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    logger.debug("执行js：{}", script);
                     // 页面加载成功后执行的脚本
                     webEngine.executeScript(script);
                     // 执行完毕后移除监听器

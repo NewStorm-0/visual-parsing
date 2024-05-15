@@ -79,7 +79,10 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         symbol = inputSymbols.get(0);
         stateStack.push(0);
         symbolIndex = 0;
-        observers.forEach(observer -> observer.showNextAlgorithmStep(0));
+        observers.forEach(observer -> {
+            observer.showNextAlgorithmStep(0);
+            observer.initializeParserState(0);
+        });
     }
 
     @Override
@@ -136,7 +139,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 return null;
             }
             observers.forEach(observer -> observer.addStepData(actionItem));
-            return new Object[] {actionItem.number()};
+            return new Object[]{actionItem.number()};
         };
     }
 
@@ -150,6 +153,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             int t = (Integer) parameters[0];
             stateStack.push(t);
+            observers.forEach(observer -> observer.addNodeToState(String.valueOf(t),
+                    symbol));
             return null;
         };
     }
@@ -176,7 +181,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 return null;
             }
             observers.forEach(observer -> observer.addStepData(actionItem));
-            return new Object[] {actionItem};
+            return new Object[]{actionItem};
         };
     }
 
@@ -189,7 +194,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
                 symbolStack.pop();
                 stateStack.pop();
             }
-            return new Object[] {production};
+            observers.forEach(observer -> observer.rollbackState(production));
+            return new Object[]{production};
         };
     }
 
@@ -197,6 +203,7 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
     /**
      * 令t为当前的栈顶状态
      * <p>在下一个步骤中，可以直接获得栈顶的状态，所以此步无需任何动作</p>
+     *
      * @return the algorithm step
      */
     private AlgorithmStep letTBeTheStateOfTheTopOfTheStack() {
@@ -214,6 +221,8 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
             int newState = lrParsingTable.go(stateStack.peek(), production.getHead());
             stateStack.push(newState);
             symbolStack.push(production.getHead());
+            observers.forEach(observer ->
+                    observer.addNodeToState(String.valueOf(newState), production.getHead()));
             return parameters;
         };
     }
@@ -237,9 +246,12 @@ public class LRParsingAlgorithm extends StepwiseAlgorithm {
         return parameters -> {
             ActionItem actionItem = lrParsingTable.action(state, symbol);
             if (actionItem != null && actionItem.action() == ActionItem.Action.ACCEPT) {
-                observers.forEach(observer -> observer.addStepData(actionItem));
+                observers.forEach(observer -> {
+                    observer.addStepData(actionItem);
+                    observer.completeExecution();
+                    observer.addNodeToState("accept", symbol);
+                });
                 completeExecution();
-                observers.forEach(LRParsingObserver::completeExecution);
             }
             return null;
         };
