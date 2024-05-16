@@ -277,7 +277,7 @@ public class GrammarViewController {
                 GrammarReaderWriter.writeGrammarToFile(grammar, grammarFile);
                 unsaved.set(false);
                 DialogShower.showInformationDialog("保存到文件成功");
-                logger.debug("保存文法：{}", grammar);
+                logger.debug("保存文法：{} 到 {}", grammar, grammarFile.getAbsolutePath());
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("错误");
@@ -382,7 +382,9 @@ public class GrammarViewController {
                 return;
             }
             try {
-                nonterminalListView.getItems().add(new Nonterminal(symbol));
+                Nonterminal nonterminal = new Nonterminal(symbol);
+                grammar.addNonterminal(nonterminal);
+                nonterminalListView.getItems().add(nonterminal);
             } catch (RepeatedSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
@@ -396,6 +398,7 @@ public class GrammarViewController {
     private void deleteNonterminal() {
         Nonterminal removedNonterminal =
                 nonterminalListView.getSelectionModel().getSelectedItem();
+        grammar.removeNonterminal(removedNonterminal);
         nonterminalListView.getItems().remove(removedNonterminal);
         logger.debug("Grammar Nonterminals: {}", grammar.getNonterminals());
     }
@@ -415,7 +418,9 @@ public class GrammarViewController {
                 return;
             }
             try {
-                terminalListView.getItems().add(new Terminal(symbol));
+                Terminal terminal = new Terminal(symbol);
+                grammar.addTerminal(terminal);
+                terminalListView.getItems().add(terminal);
             } catch (RepeatedSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
@@ -428,6 +433,7 @@ public class GrammarViewController {
     @FXML
     private void deleteTerminal() {
         Terminal removedTerminal = terminalListView.getSelectionModel().getSelectedItem();
+        grammar.removeTerminal(removedTerminal);
         terminalListView.getItems().remove(removedTerminal);
         logger.debug("Grammar Terminals: {}", grammar.getTerminals());
     }
@@ -444,54 +450,12 @@ public class GrammarViewController {
         ObservableList<Nonterminal> nonterminalObservableList;
         nonterminalObservableList =
                 FXCollections.observableArrayList(nonterminalCollection);
-        nonterminalObservableList.addListener(this::nonterminalListListener);
         nonterminalListView.setItems(nonterminalObservableList);
         // 添加所有终结符
         ObservableList<Terminal> terminalObservableList;
         terminalObservableList =
                 FXCollections.observableArrayList(terminalCollection);
-        terminalObservableList.addListener(this::terminalListListener);
         terminalListView.setItems(terminalObservableList);
-    }
-
-    /**
-     * 监听非终结符数据改变
-     *
-     * @param change 变化
-     */
-    private void nonterminalListListener(
-            ListChangeListener.Change<? extends Nonterminal> change) {
-        while (change.next()) {
-            if (change.wasAdded()) {
-                handleAddedNonterminals(change);
-            }
-            if (change.wasRemoved()) {
-                handleRemovedNonterminals(change);
-            }
-            // ExpressionHBox 自动补全更新
-            for (ExpressionHBox expressionHBox : expressionHBoxList) {
-                expressionHBox.updateLeftAutoCompletionBinding();
-            }
-            unsaved.set(true);
-        }
-    }
-
-    /**
-     * 监听终结符数据改变
-     *
-     * @param change 变化
-     */
-    private void terminalListListener(
-            ListChangeListener.Change<? extends Terminal> change) {
-        while (change.next()) {
-            if (change.wasAdded()) {
-                handleAddedTerminals(change);
-            }
-            if (change.wasRemoved()) {
-                handleRemovedTerminals(change);
-            }
-            unsaved.set(true);
-        }
     }
 
     /**
@@ -523,47 +487,6 @@ public class GrammarViewController {
             nonterminalVBox.setPrefWidth(rightWidth / 2);
             terminalVBox.setPrefWidth(rightWidth / 2);
         }));
-    }
-
-    private void handleAddedNonterminals(ListChangeListener.Change<? extends Nonterminal> change) {
-        List<Nonterminal> addedNonterminals = change.getAddedSubList()
-                .stream()
-                .map(e -> (Nonterminal) e)
-                .toList();
-        for (Nonterminal n : addedNonterminals) {
-            try {
-                grammar.addNonterminal(n);
-            } catch (RepeatedSymbolException | IllegalSymbolException e) {
-                DialogShower.showErrorDialog(e.getMessage());
-            }
-        }
-    }
-
-    private void handleRemovedNonterminals(ListChangeListener.Change<? extends Nonterminal> change) {
-        List<Nonterminal> removedNonterminals = change.getRemoved()
-                .stream()
-                .map(e -> (Nonterminal) e)
-                .toList();
-
-        removedNonterminals.forEach(grammar.getNonterminals()::remove);
-    }
-
-    private void handleAddedTerminals(ListChangeListener.Change<? extends Terminal> change) {
-        List<Terminal> addedTerminals = change.getAddedSubList()
-                .stream().map(e -> (Terminal) e).toList();
-        for (Terminal t : addedTerminals) {
-            try {
-                grammar.addTerminal(t);
-            } catch (RepeatedSymbolException | IllegalSymbolException e) {
-                DialogShower.showErrorDialog(e.getMessage());
-            }
-        }
-    }
-
-    private void handleRemovedTerminals(ListChangeListener.Change<? extends Terminal> change) {
-        List<Terminal> removedTerminals = change.getRemoved()
-                .stream().map(e -> (Terminal) e).toList();
-        removedTerminals.forEach(grammar.getTerminals()::remove);
     }
 
     /**
