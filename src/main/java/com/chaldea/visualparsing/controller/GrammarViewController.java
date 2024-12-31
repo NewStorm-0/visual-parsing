@@ -385,7 +385,7 @@ public class GrammarViewController {
                 Nonterminal nonterminal = new Nonterminal(symbol);
                 grammar.addNonterminal(nonterminal);
                 nonterminalListView.getItems().add(nonterminal);
-            } catch (RepeatedSymbolException e) {
+            } catch (RepeatedSymbolException | IllegalSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
         });
@@ -421,7 +421,7 @@ public class GrammarViewController {
                 Terminal terminal = new Terminal(symbol);
                 grammar.addTerminal(terminal);
                 terminalListView.getItems().add(terminal);
-            } catch (RepeatedSymbolException e) {
+            } catch (RepeatedSymbolException | IllegalSymbolException e) {
                 DialogShower.showErrorDialog(e.getMessage());
             }
         });
