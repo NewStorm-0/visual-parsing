@@ -314,6 +314,8 @@ public class ExpressionHBox extends HBox {
         Set<Nonterminal> nonterminals = ControllerMediator.getInstance().getNonterminalCopy();
         if (terminals.contains(new Terminal(symbol))) {
             list.add(new Terminal(symbol));
+        } else if (Terminal.EMPTY_STRING.getValue().equals(symbol)) {
+            list.add(Terminal.EMPTY_STRING);
         } else if (nonterminals.contains(new Nonterminal(symbol))) {
             list.add(new Nonterminal(symbol));
         } else {
